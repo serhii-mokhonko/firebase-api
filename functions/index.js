@@ -11,8 +11,10 @@ const functions = require("firebase-functions");
 const admin = require('firebase-admin');
 admin.initializeApp();
 
+const _ =  require('lodash');
+
 const addPage = async ({ title, body }) => {
-    if(!title || !body) 
+    if(_.isEmpty(title) || _.isEmpty(body)) 
         return false
 
     await admin.database().ref('/pages').push({title, body})
