@@ -2,12 +2,24 @@ const { pages, admin } = require('./setup.js')
 const { RESPONSE_MESSAGES } = require('../response-messages.js')
 const _ =  require('lodash')
 
+const checkValue = async (key, ref) => {
+    const snapshot = await admin.database().ref(`/${ref}/${key}`).once('value');
+    return snapshot.val();
+}
+
 const getPage = async (key) => {
-    const snapshot = await admin.database().ref(`/pages/${key}`).once('value')
+    const value = await checkValue(key, 'pages');
+    if(!value) 
+        return {
+            success: false,
+            message: RESPONSE_MESSAGES.REJECT.PAGES.KEY_NOT_FOUND
+        }
+
     return {
         success: true,
         data: snapshot.val()
     }
+
 }
 
 const addPage = async ({ title, body }) => {
@@ -26,6 +38,13 @@ const addPage = async ({ title, body }) => {
 }
 
 const editPage = async ({key, newData}) => {
+    const value = await checkValue(key, 'pages');
+    if(!value) 
+        return {
+            success: false,
+            message: RESPONSE_MESSAGES.REJECT.PAGES.KEY_NOT_FOUND
+        }
+
     const { title, body } = newData;
     if(_.isEmpty(title) || _.isEmpty(body)) 
         return {
@@ -36,11 +55,18 @@ const editPage = async ({key, newData}) => {
     await admin.database().ref(`/pages/${key}`).update({title, body});
     return {
         success: true,
-        message: 'EDITED'
+        message: RESPONSE_MESSAGES.SUCCESS.PAGES.EDITED,
     }
 }
 
 const deletePage = async (key) => {
+    const value = await checkValue(key, 'pages');
+    if(!value) 
+        return {
+            success: false,
+            message: RESPONSE_MESSAGES.REJECT.PAGES.KEY_NOT_FOUND
+        }
+
     if(_.isEmpty(key)) 
         return {
             success: false,

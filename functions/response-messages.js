@@ -3,13 +3,15 @@ const RESPONSE_MESSAGES = {
         PAGES: {
             FIELDS_EMPTY: 'Title or page body is required',
             NOT_CREATED: 'Page not created',
-            KEY_REQUIRED: 'Key is required'
+            KEY_REQUIRED: 'Key is required',
+            KEY_NOT_FOUND: 'Key not found'
         }
     },
     SUCCESS: {
         PAGES: {
             CREATED: 'Page successfully created',
-            DELETED: 'Page successfully deleted'
+            DELETED: 'Page successfully deleted',
+            EDITED: 'Page successfully updated'
         }
     }
 };
