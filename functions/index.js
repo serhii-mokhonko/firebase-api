@@ -1,37 +1,94 @@
-const express = require('express');
-// const cors = require('cors');
+const { app, admin, functions } = require('./firebase-setup.js')
+const { RESPONSE_MESSAGES } = require('./response-messages.js')
+const _ =  require('lodash')
 
-const app = express();
-// app.use(cors({ origin: false }));
-
-app.use(express.json()) // for parsing application/json
-app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
-
-const functions = require("firebase-functions");
-const admin = require('firebase-admin');
-admin.initializeApp();
-
-const _ =  require('lodash');
+const getPage = async (key) => {
+    const snapshot = await admin.database().ref(`/pages/${key}`).once('value')
+    return {
+        success: true,
+        data: snapshot.val()
+    }
+}
 
 const addPage = async ({ title, body }) => {
     if(_.isEmpty(title) || _.isEmpty(body)) 
-        return false
+        return {
+            success: false,
+            message: RESPONSE_MESSAGES.REJECT.PAGES.FIELDS_EMPTY
+        }
 
-    await admin.database().ref('/pages').push({title, body})
-    return true
+    const snapshot = await admin.database().ref('/pages').push({title, body})
+    return {
+        success: true,
+        message: RESPONSE_MESSAGES.SUCCESS.PAGES.CREATED,
+        key: snapshot.key
+    }
 }
 
-// app.get('/:id', (req, res) => res.send('HELLO ' + req.params.id));
+const editPage = async ({key, newData}) => {
+    const { title, body } = newData;
+    if(_.isEmpty(title) || _.isEmpty(body)) 
+        return {
+            success: false,
+            message: RESPONSE_MESSAGES.REJECT.PAGES.FIELDS_EMPTY
+        }
+
+    await admin.database().ref(`/pages/${key}`).update({title, body});
+    return {
+        success: true,
+        message: 'EDITED'
+    }
+}
+
+const deletePage = async (key) => {
+    if(_.isEmpty(key)) 
+        return {
+            success: false,
+            message: RESPONSE_MESSAGES.REJECT.PAGES.KEY_REQUIRED
+        }
+    
+    await admin.database().ref(`/pages/${key}`).remove()
+    return {
+        success: true,
+        message: RESPONSE_MESSAGES.SUCCESS.PAGES.DELETED,
+    }
+}
+
+app.get('/:key', async (req, res) => {
+    const pageKey = req.params.key;
+    const result = await getPage(pageKey);
+    
+    const responseStatus = result.success ? 200 : 400;
+    res.status(responseStatus).json(result);
+})
 
 app.post(`/`, async (req, res) => {
-    console.log(req.body)
     const {title, body} = req.body;
     const result = await addPage({title, body});
+    
+    const responseStatus = result.success ? 201 : 400;
+    res.status(responseStatus).json(result);
+})
 
-    if(!result) 
-        res.status(400).send("not cool");
+app.put(`/:key`, async (req, res) => {
+    const pageKey = req.params.key;
+    const {title, body} = req.body;
 
-    res.status(201).send("cool");
+    const result = await editPage({
+        key: pageKey,
+        newData: {title, body}
+    });
+    
+    const responseStatus = result.success ? 200 : 400;
+    res.status(responseStatus).json(result);
+})
+
+app.delete('/:key', async (req, res) => {
+    const pageKey = req.params.key;
+    const result = await deletePage(pageKey);
+    
+    const responseStatus = result.success ? 200 : 400;
+    res.status(responseStatus).json(result);
 })
 
 exports.pages = functions.https.onRequest(app);
