@@ -7,6 +7,27 @@ const checkValue = async (key, ref) => {
     return snapshot.val();
 }
 
+const getPages = async () => {
+    const snapshot = await admin.database().ref('/pages').once('value');
+    const data = snapshot.val();
+    if(!data)
+        return {
+            success: false,
+            massege: RESPONSE_MESSAGES.REJECT.PAGES.NOT_FOUND
+        }
+
+    let result = [];
+
+    _.forIn(data, (val, key) => {
+        result.push(_.assign(val, {'id': key}));
+    })
+    
+    return {
+        success: true,
+        data: result
+    }
+}
+
 const getPage = async (key) => {
     const value = await checkValue(key, 'pages');
     if(!value) 
@@ -82,7 +103,17 @@ const deletePage = async (key) => {
 
 pages.get('/:key', async (req, res) => {
     const pageKey = req.params.key;
-    const result = await getPage(pageKey);
+    let result = await getPage(pageKey);
+    if(!pageKey){
+        result = await getPages();
+    }
+    
+    const responseStatus = result.success ? 200 : 400;
+    res.status(responseStatus).json(result);
+})
+
+pages.get('/', async (req, res) => {
+    const result = await getPages();
     
     const responseStatus = result.success ? 200 : 400;
     res.status(responseStatus).json(result);
