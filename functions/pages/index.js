@@ -43,14 +43,20 @@ const getPage = async (key) => {
 
 }
 
-const addPage = async ({ title, body }) => {
+const addPage = async ({ title, body, userId, visible=false}) => {
+    if(!userId)
+        return {
+            success: false,
+            message: RESPONSE_MESSAGES.REJECT.PAGES.ERRORUSER
+        }
+    
     if(_.isEmpty(title) || _.isEmpty(body)) 
         return {
             success: false,
             message: RESPONSE_MESSAGES.REJECT.PAGES.FIELDS_EMPTY
         }
 
-    const snapshot = await admin.database().ref('/pages').push({title, body})
+    const snapshot = await admin.database().ref('/pages').push({title, body, userId, visible})
     return {
         success: true,
         message: RESPONSE_MESSAGES.SUCCESS.PAGES.CREATED,
@@ -66,14 +72,20 @@ const editPage = async ({key, newData}) => {
             message: RESPONSE_MESSAGES.REJECT.PAGES.KEY_NOT_FOUND
         }
 
-    const { title, body } = newData;
+    const { title, body, userId, visible } = newData;
+    if(!userId)
+        return {
+            success: false,
+            message: RESPONSE_MESSAGES.REJECT.PAGES.ERRORUSER
+        }
+    
     if(_.isEmpty(title) || _.isEmpty(body)) 
         return {
             success: false,
             message: RESPONSE_MESSAGES.REJECT.PAGES.FIELDS_EMPTY
         }
 
-    await admin.database().ref(`/pages/${key}`).update({title, body});
+    await admin.database().ref(`/pages/${key}`).update({title, body, userId, visible});
     return {
         success: true,
         message: RESPONSE_MESSAGES.SUCCESS.PAGES.EDITED,
@@ -120,8 +132,9 @@ pages.get('/', async (req, res) => {
 })
 
 pages.post(`/`, async (req, res) => {
-    const {title, body} = req.body;
-    const result = await addPage({title, body});
+    const {title, body, visible} = req.body;
+    const userId = req.user.uid;
+    const result = await addPage({title, body, userId, visible});
     
     const responseStatus = result.success ? 201 : 400;
     res.status(responseStatus).json(result);
@@ -129,11 +142,12 @@ pages.post(`/`, async (req, res) => {
 
 pages.put(`/:key`, async (req, res) => {
     const pageKey = req.params.key;
-    const {title, body} = req.body;
-
+    const {title, body, visible} = req.body;
+    const userId = req.user.uid;
+    
     const result = await editPage({
         key: pageKey,
-        newData: {title, body}
+        newData: {title, body, userId, visible}
     });
     
     const responseStatus = result.success ? 200 : 400;
