@@ -40,7 +40,6 @@ exports.validateFirebaseIdToken = async (req) => {
       status: 403,
       message: `Unauthorized`
     };
-    return;
   }
 };
 
