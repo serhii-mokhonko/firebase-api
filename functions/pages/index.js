@@ -16,6 +16,7 @@ const getPages = async () => {
             massege: RESPONSE_MESSAGES.REJECT.PAGES.NOT_FOUND
         }
 
+    //update of object structure for response
     let result = [];
 
     _.forIn(data, (val, key) => {
@@ -38,7 +39,7 @@ const getPage = async (key) => {
 
     return {
         success: true,
-        data: snapshot.val()
+        data: value
     }
 
 }
@@ -72,7 +73,7 @@ const editPage = async ({key, newData}) => {
             message: RESPONSE_MESSAGES.REJECT.PAGES.KEY_NOT_FOUND
         }
 
-    const { title, body, userId, visible } = newData;
+    const { title, body, userId } = newData;
     if(!userId)
         return {
             success: false,
@@ -85,11 +86,11 @@ const editPage = async ({key, newData}) => {
             message: RESPONSE_MESSAGES.REJECT.PAGES.FIELDS_EMPTY
         }
 
-    await admin.database().ref(`/pages/${key}`).update({title, body, userId, visible});
-    return {
-        success: true,
-        message: RESPONSE_MESSAGES.SUCCESS.PAGES.EDITED,
-    }
+    await admin.database().ref(`/pages/${key}`).update(newData);
+        return {
+            success: true,
+            message: RESPONSE_MESSAGES.SUCCESS.PAGES.EDITED,
+        }
 }
 
 const deletePage = async (key) => {
@@ -116,10 +117,7 @@ const deletePage = async (key) => {
 pages.get('/:key', async (req, res) => {
     const pageKey = req.params.key;
     let result = await getPage(pageKey);
-    if(!pageKey){
-        result = await getPages();
-    }
-    
+
     const responseStatus = result.success ? 200 : 400;
     res.status(responseStatus).json(result);
 })
@@ -144,7 +142,7 @@ pages.put(`/:key`, async (req, res) => {
     const pageKey = req.params.key;
     const {title, body, visible} = req.body;
     const userId = req.user.uid;
-    
+
     const result = await editPage({
         key: pageKey,
         newData: {title, body, userId, visible}
