@@ -8,6 +8,14 @@ const checkValue = async (key, ref) => {
     return snapshot.val();
 }
 
+const transformData = (data) => {
+    let arr = [];
+    _.forIn(data, (val, key) => {
+        arr.push(_.assign(val, {'id': key}));
+    })
+    return arr;
+}
+
 const getPages = async () => {
     const snapshot = await admin.database().ref('/pages').once('value');
     const data = snapshot.val();
@@ -17,12 +25,7 @@ const getPages = async () => {
             massege: RESPONSE_MESSAGES.REJECT.PAGES.NOT_FOUND
         }
 
-    //update of object structure for response
-    let result = [];
-
-    _.forIn(data, (val, key) => {
-        result.push(_.assign(val, {'id': key}));
-    })
+    const result = transformData(data);
     
     return {
         success: true,
@@ -31,16 +34,18 @@ const getPages = async () => {
 }
 
 const getPage = async (key) => {
-    const value = await checkValue(key, 'pages');
+    let value = await checkValue(key, 'pages');
     if(!value) 
         return {
             success: false,
             message: RESPONSE_MESSAGES.REJECT.PAGES.KEY_NOT_FOUND
         }
 
+    const data = _.assign(value, {'id': key});
+
     return {
         success: true,
-        data: value
+        data
     }
 
 }
