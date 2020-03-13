@@ -68,13 +68,7 @@ const editPage = async ({key, newData}) => {
             message: RESPONSE_MESSAGES.REJECT.PAGES.KEY_NOT_FOUND
         }
 
-    const { title, body, userId } = newData;
-    if(!userId)
-        return {
-            success: false,
-            message: RESPONSE_MESSAGES.REJECT.PAGES.ERRORUSER
-        }
-    
+    const { title, body } = newData;
     if(_.isEmpty(title) || _.isEmpty(body)) 
         return {
             success: false,
@@ -126,9 +120,8 @@ pages.get('/', async (req, res) => {
 
 pages.post('/', async (req, res) => {
     const {title, body, visible} = req.body;
-    // const userId = req.user.uid;
-    const isLoggedIn = await authenticate(req);
     
+    const isLoggedIn = await authenticate(req);
     const result = isLoggedIn.authenticated ? await addPage({title, body, userId: isLoggedIn.userID, visible}) : isLoggedIn;
    
     const responseStatus = result.success ? 201 : 400;
@@ -138,12 +131,9 @@ pages.post('/', async (req, res) => {
 pages.put(`/:key`, async (req, res) => {
     const pageKey = req.params.key;
     const {title, body, visible} = req.body;
-    const userId = req.user.uid;
 
-    const result = await editPage({
-        key: pageKey,
-        newData: {title, body, userId, visible}
-    });
+    const isLoggedIn = await authenticate(req);
+    const result = isLoggedIn.authenticated ? await editPage({ key: pageKey, newData: {title, body, userId: isLoggedIn.userID, visible}}) : isLoggedIn;
     
     const responseStatus = result.success ? 200 : 400;
     res.status(responseStatus).json(result);
@@ -151,7 +141,9 @@ pages.put(`/:key`, async (req, res) => {
 
 pages.delete('/:key', async (req, res) => {
     const pageKey = req.params.key;
-    const result = await deletePage(pageKey);
+
+    const isLoggedIn = await authenticate(req);
+    const result = isLoggedIn.authenticated ? await deletePage(pageKey) : isLoggedIn;
     
     const responseStatus = result.success ? 200 : 400;
     res.status(responseStatus).json(result);
