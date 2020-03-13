@@ -1,6 +1,6 @@
 const { pages, admin } = require('./setup.js')
 const { RESPONSE_MESSAGES } = require('../response-messages.js')
-const {validateFirebaseIdToken} = require('./validate');
+const { authenticate } = require('./authenticate');
 const _ =  require('lodash')
 
 const checkValue = async (key, ref) => {
@@ -46,12 +46,6 @@ const getPage = async (key) => {
 }
 
 const addPage = async ({ title, body, userId, visible = false }) => {
-    if(!userId)
-        return {
-            success: false,
-            message: RESPONSE_MESSAGES.REJECT.PAGES.ERRORUSER
-        }
-    
     if(_.isEmpty(title) || _.isEmpty(body)) 
         return {
             success: false,
@@ -130,16 +124,13 @@ pages.get('/', async (req, res) => {
     res.status(responseStatus).json(result);
 })
 
-pages.post(`/`, async (req, res) => {
+pages.post('/', async (req, res) => {
     const {title, body, visible} = req.body;
-    const userId = req.user.uid;
-
-    const isLoggedIn = await validateFirebaseIdToken(req);
-    if(!isLoggedIn.authenticated)
-        return isLoggedIn;
-
-    const result = await addPage({title, body, userId, visible});
+    // const userId = req.user.uid;
+    const isLoggedIn = await authenticate(req);
     
+    const result = isLoggedIn.authenticated ? await addPage({title, body, userId: isLoggedIn.userID, visible}) : isLoggedIn;
+   
     const responseStatus = result.success ? 201 : 400;
     res.status(responseStatus).json(result);
 })
