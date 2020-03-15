@@ -16,6 +16,12 @@ pages.use(express.urlencoded({ extended: true }));
 pages.use(cors);
 pages.use(cookieParser);
 
+//Auth
+const { auth } = require('./auth');
+auth.use(express.json());
+auth.use(express.urlencoded({ extended: true }));
+
 
 //Main exports for Firebase
 exports.pages = functions.https.onRequest(pages);
+exports.auth = functions.https.onRequest(auth);
