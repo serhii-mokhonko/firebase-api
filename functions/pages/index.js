@@ -1,6 +1,9 @@
-const { pages, admin } = require('./setup.js')
+const admin = require('firebase-admin')
+const express = require('express')
+const pages = express()
+
 const { RESPONSE_MESSAGES } = require('../response-messages.js')
-const { authenticate } = require('./authenticate');
+const { authenticate } = require('../authenticate');
 const _ =  require('lodash')
 
 const checkValue = async (key, ref) => {

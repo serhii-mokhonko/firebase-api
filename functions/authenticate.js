@@ -1,6 +1,5 @@
 const admin = require("firebase-admin");
 
-
 exports.authenticate = async (req) => {
   if (!req.headers.authorization || !req.headers.authorization.startsWith('Bearer ')) {
     return {
