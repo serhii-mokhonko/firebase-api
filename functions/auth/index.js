@@ -1,14 +1,23 @@
-const admin = require('firebase-admin');
 const express = require('express');
 const auth = express();
 
-const { RESPONSE_MESSAGES } = require('../response-messages.js');
-const _ =  require('lodash');
+const { authenticate } = require('../authenticate');
+const { createUser } = require('./functions');
 
-auth.get('/', (req, res) => {
-    res.json({
-        response: "Hello"
-    });
+//List all users
+
+//Create new user
+auth.post('/register', async (req, res) => {
+    const isLogedIn = await authenticate(req);
+    const result =  isLogedIn.authenticated ? await createUser(req) : isLogedIn;
+
+    const resStatus = result.success ? 200 : 400;
+    res.status(resStatus).json(result);
 });
+
+//Update user
+
+//Delete user
+
 
 exports.auth = auth;

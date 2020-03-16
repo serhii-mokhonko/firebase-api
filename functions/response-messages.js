@@ -7,6 +7,11 @@ const RESPONSE_MESSAGES = {
             KEY_REQUIRED: 'Key is required',
             KEY_NOT_FOUND: 'Key not found',
             ERRORUSER: 'User does not exist'
+        },
+        AUTH: {
+            ERROREMAILORPASS: "Email and password are required",
+            NOT_CREATED: "User can't be created",
+            USER_EXISTS: "User with this email exists"
         }
     },
     SUCCESS: {
@@ -14,6 +19,9 @@ const RESPONSE_MESSAGES = {
             CREATED: 'Page successfully created',
             DELETED: 'Page successfully deleted',
             EDITED: 'Page successfully updated'
+        },
+        AUTH: {
+            CREATED: "User successfully created"
         }
     }
 };
