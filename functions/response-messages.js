@@ -13,7 +13,9 @@ const RESPONSE_MESSAGES = {
             NOT_CREATED: "User can't be created",
             USER_EXISTS: "User with this email exists",
             USERS_LIST: "Can't get list of users",
-            NOT_DELETE: "Can't delete this user"
+            NOT_DELETE: "Can't delete this user",
+            NOT_UPDATE: "Sorry! Can't update user.",
+            LENGTH_OF_PASS: "Password must contain minimum 6 characters"
         }
     },
     SUCCESS: {
@@ -24,7 +26,8 @@ const RESPONSE_MESSAGES = {
         },
         AUTH: {
             CREATED: "User successfully created",
-            DELETED: "User successfully deleted"
+            DELETED: "User successfully deleted",
+            UPDATED: "User successfully updated"
         }
     }
 };

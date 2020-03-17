@@ -2,7 +2,7 @@ const express = require('express');
 const auth = express();
 const _ = require('lodash');
 const { authenticate } = require('../authenticate');
-const { createUser, getAllUsers, deleteUser } = require('./functions');
+const { createUser, getAllUsers, deleteUser, updateUser } = require('./functions');
 
 //List of all users
 auth.get('/', async (req, res) => {
@@ -11,6 +11,7 @@ auth.get('/', async (req, res) => {
     
     const isLogedIn = await authenticate(req);
     const result = isLogedIn.authenticated ? await getAllUsers(parseInt(limit), nextPageToken) : isLogedIn;
+    
     const resStatus = result.success ? 200 : 400;
     res.status(resStatus).json(result);
 });
@@ -25,6 +26,13 @@ auth.post('/register', async (req, res) => {
 });
 
 //Update user
+auth.put('/:id', async (req, res) => {
+    const isLogedIn = await authenticate(req);
+    const result =  isLogedIn.authenticated ? await updateUser(req) : isLogedIn;
+
+    const resStatus = result.success ? 200 : 400;
+    res.status(resStatus).json(result);
+});
 
 //Delete user
 auth.delete('/:id', async (req, res) => {

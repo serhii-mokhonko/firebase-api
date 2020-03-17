@@ -26,7 +26,7 @@ exports.createUser = async (req) => {
             message: RESPONSE_MESSAGES.REJECT.AUTH.USER_EXISTS
         };
 
-    if(_.isEmpty(email) && _.isEmpty(password))
+    if(_.isEmpty(email) || _.isEmpty(password))
         return {
             success: false,
             message: RESPONSE_MESSAGES.REJECT.AUTH.ERROREMAILORPASS
@@ -88,6 +88,43 @@ exports.deleteUser = async (id) => {
         return {
             success: false,
             message: RESPONSE_MESSAGES.REJECT.AUTH.NOT_DELETE
+        }
+    }
+};
+
+exports.updateUser = async (req) => {
+    const { id } = req.params;
+    let { email, password } = req.body;
+
+    if(_.isEmpty(email) || _.isEmpty(password))
+        return {
+            success: false,
+            message: RESPONSE_MESSAGES.REJECT.AUTH.ERROREMAILORPASS
+        };
+    
+    if(password.length < 6)
+        return {
+            success: false,
+            message: RESPONSE_MESSAGES.REJECT.AUTH.LENGTH_OF_PASS
+        }
+
+    // Need fixed problem with email to the same user
+    // if(await checkUser(email))
+    //     return {
+    //         success: false,
+    //         message: RESPONSE_MESSAGES.REJECT.AUTH.USER_EXISTS
+    //     }
+
+    try{
+        await admin.auth().updateUser(id, { email, password });
+        return {
+            success: true,
+            message: RESPONSE_MESSAGES.SUCCESS.AUTH.UPDATED
+        }
+    }catch(e){
+        return {
+            success: false,
+            message: RESPONSE_MESSAGES.REJECT.AUTH.NOT_UPDATE
         }
     }
 };
