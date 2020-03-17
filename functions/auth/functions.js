@@ -49,3 +49,30 @@ exports.createUser = async (req) => {
 
     }
 };
+
+exports.getAllUsers = async (limit, pageToken) => {
+    const users = [];
+    try{
+        const listUsers = await admin.auth().listUsers(limit, pageToken);
+        console.log("TOKEN:", listUsers.pageToken);
+        listUsers.users.forEach(el => {
+            users.push(el);
+        });
+            if(listUsers.pageToken)
+                return {
+                    success: true,
+                    result: users,
+                    nextPage: listUsers.pageToken
+                }
+
+            return {
+                success: true,
+                result: users
+            }
+    }catch(e){
+        return {
+            success: false,
+            message: RESPONSE_MESSAGES.REJECT.AUTH.USERS_LIST
+        }
+    }
+};
