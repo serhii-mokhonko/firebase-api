@@ -12,7 +12,8 @@ const RESPONSE_MESSAGES = {
             ERROREMAILORPASS: "Email and password are required",
             NOT_CREATED: "User can't be created",
             USER_EXISTS: "User with this email exists",
-            USERS_LIST: "Can't get list of users"
+            USERS_LIST: "Can't get list of users",
+            NOT_DELETE: "Can't delete this user"
         }
     },
     SUCCESS: {
@@ -22,7 +23,8 @@ const RESPONSE_MESSAGES = {
             EDITED: 'Page successfully updated'
         },
         AUTH: {
-            CREATED: "User successfully created"
+            CREATED: "User successfully created",
+            DELETED: "User successfully deleted"
         }
     }
 };

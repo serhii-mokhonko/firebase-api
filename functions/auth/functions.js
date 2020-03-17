@@ -76,3 +76,18 @@ exports.getAllUsers = async (limit, pageToken) => {
         }
     }
 };
+
+exports.deleteUser = async (id) => {
+    try{
+        await admin.auth().deleteUser(id);
+        return {
+            success: true,
+            message: RESPONSE_MESSAGES.SUCCESS.AUTH.DELETED
+        }
+    }catch(e){
+        return {
+            success: false,
+            message: RESPONSE_MESSAGES.REJECT.AUTH.NOT_DELETE
+        }
+    }
+};
