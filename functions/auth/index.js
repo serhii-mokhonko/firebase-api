@@ -17,7 +17,7 @@ auth.get('/', async (req, res) => {
 });
 
 //Create new user
-auth.post('/register', async (req, res) => {
+auth.post('/', async (req, res) => {
     const isLogedIn = await authenticate(req);
     const result =  isLogedIn.authenticated ? await createUser(req) : isLogedIn;
 
@@ -42,7 +42,7 @@ auth.delete('/:id', async (req, res) => {
     
     const resStatus = result.success ? 200 : 400;
     res.status(resStatus).json(result);
-})
+});
 
 
 exports.auth = auth;
