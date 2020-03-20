@@ -21,7 +21,13 @@ const { auth } = require('./auth');
 auth.use(express.json());
 auth.use(express.urlencoded({ extended: true }));
 
+//Gallery
+const { gallery } = require('./gallery');
+gallery.use(express.json());
+gallery.use(express.urlencoded({ extended: true }));
+
 
 //Main exports for Firebase
 exports.pages = functions.https.onRequest(pages);
 exports.auth = functions.https.onRequest(auth);
+exports.gallery = functions.https.onRequest(gallery);
