@@ -1,9 +1,7 @@
 //Firebase
 const functions = require("firebase-functions");
 const admin = require('firebase-admin');
-admin.initializeApp({
-    storageBucket: "nuft-kebop.appspot.com"
-});
+admin.initializeApp();
 
 //Other imports
 const express = require('express');
@@ -25,6 +23,9 @@ auth.use(express.urlencoded({ extended: true }));
 
 //Gallery
 const { gallery } = require('./gallery');
+gallery.use(cors);
+gallery.use(express.json());
+gallery.use(express.urlencoded({ extended: true }));
 
 
 //Main exports for Firebase

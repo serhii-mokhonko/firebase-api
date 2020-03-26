@@ -15,6 +15,10 @@ const RESPONSE_MESSAGES = {
             NOT_DELETE: "Can't delete this user",
             NOT_UPDATE: "Sorry! Can't update user.",
             LENGTH_OF_PASS: "Password must contain minimum 6 characters"
+        },
+        GALLERY: {
+            NOT_FILE: 'File does not exist',
+            WRITETODB: "The information is not recorded to the database"
         }
     },
     SUCCESS: {
@@ -27,6 +31,10 @@ const RESPONSE_MESSAGES = {
             CREATED: "User successfully created",
             DELETED: "User successfully deleted",
             UPDATED: "User successfully updated"
+        },
+        GALLERY: {
+            UPLOADED: 'File uploaded',
+            WRITETODB: "The information successfully has written to database"
         }
     }
 };
