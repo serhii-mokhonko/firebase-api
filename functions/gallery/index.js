@@ -1,6 +1,6 @@
 const express = require('express');
 const gallery = express();
-const { uploadFile, writeToDb } = require('./functions');
+const { createRecord, writeToDb, uploadFile } = require('./functions');
 
 
 //Bucket config
@@ -18,29 +18,30 @@ gallery.post('/', async (req, res) => {
   let dbWriteDataResult;
   let result;
 
-  const fileUploadResult = await uploadFile(req, bucket);
+  const { id } = await createRecord();
+
+  const fileUploadResult = await uploadFile(req, bucket, id);
   
   if(fileUploadResult.success) {
-    dbWriteDataResult = await writeToDb(fileUploadResult.result);
+    dbWriteDataResult = await writeToDb(id, fileUploadResult.result);
   }
   
   if(fileUploadResult.success && dbWriteDataResult.success){
     result = {
       success: true,
-      message: [
+      messages: [
         fileUploadResult.message,
         dbWriteDataResult.message
       ],
-      dbKey: dbWriteDataResult.dbKey,
+      dbKey: id,
       info: fileUploadResult.result
     };
   }else {
     result = {
       success: false,
-      message: [
+      messages: [
         fileUploadResult.message,
-        dbWriteDataResult.message,
-        dbWriteDataResult.error
+        dbWriteDataResult.message
       ]
     };
   }
