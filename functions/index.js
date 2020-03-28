@@ -36,5 +36,4 @@ exports.gallery = functions.https.onRequest(gallery);
 const { deleteFromBucket, uploadFile } = require('./gallery/trigers');
 
 // trigers
-exports.uploadFile =  functions.storage.object().onFinalize(uploadFile);
 exports.deleteFromBucket =  functions.storage.object().onDelete(deleteFromBucket);
