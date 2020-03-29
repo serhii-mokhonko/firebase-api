@@ -16,7 +16,7 @@ exports.createRecord = async () => {
 
 exports.writeToDb = async (id, data) => {
     try{
-        await admin.database().ref(`/gallery/${id}`).update(data);
+        await admin.database().ref(`/gallery/${id}`).set(data);
         return {
             success: true,
             message: RESPONSE_MESSAGES.SUCCESS.GALLERY.WRITETODB
@@ -49,7 +49,7 @@ exports.uploadFile = (req, bucket, id) => {
             }
 
             const extention = filename.substr(-3);
-            newFileName = `${id}_${time}.${extention}`;
+            newFileName = `${id}&${time}.${extention}`;
             const filepath = path.join(os.tmpdir(), newFileName);
             const fileUrl = `https://storage.googleapis.com/nuft-kebop.appspot.com/${newFileName}`;
             uploadData = { file: filepath, type: mimetype, fileUrl };
