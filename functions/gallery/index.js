@@ -1,6 +1,6 @@
 const express = require('express');
 const gallery = express();
-const { createRecord, writeToDb, uploadFile } = require('./functions');
+const { createRecord, writeToDb, uploadFile, deleteFile } = require('./functions');
 
 
 //Bucket config
@@ -48,6 +48,15 @@ gallery.post('/', async (req, res) => {
 
   const status = result.success ? 200 : 500;
   res.status(status).json(result);
-}); 
+});
+
+gallery.delete('/:fileName', async (req, res) => {
+  const { fileName } = req.params;
+
+  const result = await deleteFile(fileName, bucket);
+
+  const status = result.success ? 200 : 400;
+  res.status(status).json(result);
+});
 
 exports.gallery = gallery;

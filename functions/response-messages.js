@@ -18,7 +18,8 @@ const RESPONSE_MESSAGES = {
         },
         GALLERY: {
             NOT_FILE: 'File does not exist',
-            WRITETODB: "The information is not recorded to the database"
+            WRITETODB: "The information is not recorded to the database",
+            NOT_DELETE: "File can't delete or file doesn't exist"
         }
     },
     SUCCESS: {
@@ -34,7 +35,8 @@ const RESPONSE_MESSAGES = {
         },
         GALLERY: {
             UPLOADED: 'File uploaded',
-            WRITETODB: "The information successfully has written to database"
+            WRITETODB: "The information successfully has written to database",
+            DELETED: "File deleted"
         }
     }
 };

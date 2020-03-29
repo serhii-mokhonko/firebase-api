@@ -86,3 +86,18 @@ exports.uploadFile = (req, bucket, id) => {
     });
 };
 
+exports.deleteFile = async (fileName, bucket) => {
+    const file = bucket.file(fileName);
+    try {
+        await file.delete();
+        return {
+            success: true,
+            message: RESPONSE_MESSAGES.SUCCESS.GALLERY.DELETED
+        }
+    }catch(err){
+        return {
+            success: false,
+            message: RESPONSE_MESSAGES.REJECT.GALLERY.NOT_DELETE
+        }
+    }
+};
