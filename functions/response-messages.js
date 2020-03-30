@@ -19,7 +19,8 @@ const RESPONSE_MESSAGES = {
         GALLERY: {
             NOT_FILE: 'File does not exist',
             WRITETODB: "The information is not recorded to the database",
-            NOT_DELETE: "File can't delete or file doesn't exist"
+            NOT_DELETE: "File can't delete or file doesn't exist",
+            GET_DATA: "Can't get data or data doesn't exist"
         }
     },
     SUCCESS: {

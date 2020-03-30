@@ -1,4 +1,5 @@
 const admin = require('firebase-admin');
+const _ = require('lodash');
 const os = require('os');
 const path = require('path');
 const Busboy = require('busboy');
@@ -100,4 +101,29 @@ exports.deleteFile = async (fileName, bucket) => {
             message: RESPONSE_MESSAGES.REJECT.GALLERY.NOT_DELETE
         }
     }
+};
+
+exports.getListsOfFiles = async (limit) => {
+    try{
+        const dbRecords =  await admin.database().ref('/gallery').once('value');
+        const data = transformData(dbRecords.val());
+        return{
+            success: true,
+            data: data
+        }
+    }catch(e){
+        return {
+            success: false,
+            message: RESPONSE_MESSAGES.REJECT.GALLERY.GET_DATA
+        }
+    }
+    
+}
+
+const transformData = (obj) => {
+    const arr = [];
+    _.forIn(obj, (val, key) => {
+        arr.push(_.assign(val, {'id': key}));
+    })
+    return arr;
 };

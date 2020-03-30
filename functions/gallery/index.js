@@ -1,6 +1,6 @@
 const express = require('express');
 const gallery = express();
-const { createRecord, writeToDb, uploadFile, deleteFile } = require('./functions');
+const { createRecord, writeToDb, uploadFile, deleteFile, getListsOfFiles } = require('./functions');
 
 
 //Bucket config
@@ -12,8 +12,6 @@ const { Storage } = require('@google-cloud/storage');
 const gcs = new Storage(gcconfig);
 const bucket = gcs.bucket("nuft-kebop.appspot.com");
 
-
-//Upload
 gallery.post('/', async (req, res) => {
   let dbWriteDataResult;
   let result;
@@ -57,6 +55,13 @@ gallery.delete('/:fileName', async (req, res) => {
 
   const status = result.success ? 200 : 400;
   res.status(status).json(result);
+});
+
+gallery.get('/', async (req, res) => {
+  const result = await getListsOfFiles();
+
+  const status = result.success ? 200 : 400;
+  res.status(200).json(result);
 });
 
 exports.gallery = gallery;
