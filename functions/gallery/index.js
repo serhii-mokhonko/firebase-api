@@ -58,10 +58,11 @@ gallery.delete('/:fileName', async (req, res) => {
 });
 
 gallery.get('/', async (req, res) => {
-  const result = await getListsOfFiles();
+  const { start, itemOnPage } = req.query;  
+  const result = await getListsOfFiles(parseInt(itemOnPage), parseInt(start));
 
   const status = result.success ? 200 : 400;
-  res.status(200).json(result);
+  res.status(status).json(result);
 });
 
 exports.gallery = gallery;

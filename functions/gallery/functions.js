@@ -6,8 +6,6 @@ const Busboy = require('busboy');
 const fs = require('fs');
 const { RESPONSE_MESSAGES } = require('../response-messages');
 
-
-//database
 exports.createRecord = async () => {
     const snapshot = await admin.database().ref('/gallery').push();
     return {
@@ -31,8 +29,6 @@ exports.writeToDb = async (id, data) => {
     }
 };
 
-
-//storge
 exports.uploadFile = (req, bucket, id) => {
     return new Promise((resolve) => {
         const busboy = new Busboy({ headers: req.headers });
@@ -103,15 +99,21 @@ exports.deleteFile = async (fileName, bucket) => {
     }
 };
 
-exports.getListsOfFiles = async (limit) => {
+exports.getListsOfFiles = async (itemOnPage, start) => {
+    itemOnPage = itemOnPage || 25;
+    start = start || 0;
     try{
         const dbRecords =  await admin.database().ref('/gallery').once('value');
-        const data = transformData(dbRecords.val());
+        const keys = Object.keys(dbRecords.val()).sort();
+        const key = keys[start]
+        const query = admin.database().ref('/gallery').orderByKey().limitToFirst(itemOnPage).startAt(key);
+        const result = await query.once('value');
+        const data = transformData(result.val());
         return{
             success: true,
-            data: data
+            data
         }
-    }catch(e){
+    }catch(err){
         return {
             success: false,
             message: RESPONSE_MESSAGES.REJECT.GALLERY.GET_DATA
