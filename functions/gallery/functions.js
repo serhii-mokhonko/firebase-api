@@ -13,9 +13,10 @@ exports.createRecord = async () => {
     };
 }
 
-exports.writeToDb = async (id, data) => {
+exports.writeToDb = async (id, data, description='') => {
+    const dbRecord = _.assign(data, { description });
     try{
-        await admin.database().ref(`/gallery/${id}`).set(data);
+        await admin.database().ref(`/gallery/${id}`).set(dbRecord);
         return {
             success: true,
             message: RESPONSE_MESSAGES.SUCCESS.GALLERY.WRITETODB
@@ -104,13 +105,14 @@ exports.getListsOfFiles = async (itemOnPage, start) => {
     start = start || 0;
     try{
         const dbRecords =  await admin.database().ref('/gallery').once('value');
-        const keys = Object.keys(dbRecords.val()).sort();
+        const keys = Object.keys(dbRecords.val()).reverse();
         const key = keys[start]
-        const query = admin.database().ref('/gallery').orderByKey().limitToFirst(itemOnPage).startAt(key);
+        const query = admin.database().ref('/gallery').orderByKey().limitToLast(itemOnPage).endAt(key);
         const result = await query.once('value');
-        const data = transformData(result.val());
+        const data = transformData(result.val()).reverse();
         return{
             success: true,
+            сountOfItems: keys.length,
             data
         }
     }catch(err){

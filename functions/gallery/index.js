@@ -13,6 +13,7 @@ const gcs = new Storage(gcconfig);
 const bucket = gcs.bucket("nuft-kebop.appspot.com");
 
 gallery.post('/', async (req, res) => {
+  const { description } = req.query;
   let dbWriteDataResult;
   let result;
 
@@ -21,7 +22,7 @@ gallery.post('/', async (req, res) => {
   const fileUploadResult = await uploadFile(req, bucket, id);
   
   if(fileUploadResult.success) {
-    dbWriteDataResult = await writeToDb(id, fileUploadResult.result);
+    dbWriteDataResult = await writeToDb(id, fileUploadResult.result, description);
   }
   
   if(fileUploadResult.success && dbWriteDataResult.success){
