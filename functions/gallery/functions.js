@@ -46,7 +46,8 @@ exports.uploadFile = (req, bucket, id) => {
                 return;
             }
 
-            const extention = filename.substr(-3);
+            const regexp = /(?:\.([^.]+))?$/;
+            const extention = regexp.exec(filename)[1];
             newFileName = `${id}&${time}.${extention}`;
             const filepath = path.join(os.tmpdir(), newFileName);
             const fileUrl = `https://storage.googleapis.com/nuft-kebop.appspot.com/${newFileName}`;
