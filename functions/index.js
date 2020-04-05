@@ -41,6 +41,12 @@ gallery.use(cors);
 gallery.use(express.json());
 gallery.use(express.urlencoded({ extended: true }));
 
+//Gallery
+const { siteInfo } = require('./site-info');
+siteInfo.use(cors);
+siteInfo.use(express.json());
+siteInfo.use(express.urlencoded({ extended: true }));
+
 
 //Main exports for Firebase
 exports.pages = functions.https.onRequest(pages);
@@ -48,6 +54,7 @@ exports.auth = functions.https.onRequest(auth);
 exports.gallery = functions.https.onRequest(gallery);
 exports.news = functions.https.onRequest(news);
 exports.sideBlocks = functions.https.onRequest(sideBlocks);
+exports.siteInfo = functions.https.onRequest(siteInfo);
 
 const { deleteFromBucket, uploadFile } = require('./gallery/trigers');
 
