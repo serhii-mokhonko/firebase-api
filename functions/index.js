@@ -16,12 +16,19 @@ pages.use(express.urlencoded({ extended: true }));
 pages.use(cors);
 pages.use(cookieParser);
 
-//Pages
+//News
 const { news } = require('./news');
 news.use(express.json());
 news.use(express.urlencoded({ extended: true }));
 news.use(cors);
 news.use(cookieParser);
+
+//News
+const { sideBlocks } = require('./side-blocks');
+sideBlocks.use(express.json());
+sideBlocks.use(express.urlencoded({ extended: true }));
+sideBlocks.use(cors);
+sideBlocks.use(cookieParser);
 
 //Auth
 const { auth } = require('./auth');
@@ -40,6 +47,7 @@ exports.pages = functions.https.onRequest(pages);
 exports.auth = functions.https.onRequest(auth);
 exports.gallery = functions.https.onRequest(gallery);
 exports.news = functions.https.onRequest(news);
+exports.sideBlocks = functions.https.onRequest(sideBlocks);
 
 const { deleteFromBucket, uploadFile } = require('./gallery/trigers');
 
