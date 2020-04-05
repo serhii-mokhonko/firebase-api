@@ -1,5 +1,7 @@
 const express = require('express');
 const gallery = express();
+const cors = require('cors');
+gallery.use(cors());
 const { createRecord, writeToDb, uploadFile, deleteFile, getListsOfFiles } = require('./functions');
 
 
