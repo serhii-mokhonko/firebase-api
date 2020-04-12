@@ -25,6 +25,13 @@ auth.post('/', async (req, res) => {
     res.status(resStatus).json(result);
 });
 
+auth.post('/checkUserToken', async (req, res) => {
+    const isLogedIn = await authenticate(req);
+
+    const resStatus = isLogedIn.authenticated ? 200 : 401;
+    res.status(resStatus).json(isLogedIn);
+})
+
 //Update user
 auth.put('/:id', async (req, res) => {
     const isLogedIn = await authenticate(req);
