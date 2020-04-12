@@ -4,6 +4,15 @@ const _ = require('lodash');
 const { authenticate } = require('../authenticate');
 const { createUser, getAllUsers, deleteUser, updateUser } = require('./functions');
 
+
+auth.get('/auth', async (req, res) => {    
+    const isLogedIn = await authenticate(req);
+    
+    const resStatus = isLogedIn.authenticated ? 200 : 401;
+    res.set('Access-Control-Allow-Origin', '*')
+    res.status(resStatus).json(isLogedIn);
+});
+
 //List of all users
 auth.get('/', async (req, res) => {
     let { limit, nextPageToken } = req.query;
