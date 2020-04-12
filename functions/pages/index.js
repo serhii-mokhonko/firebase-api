@@ -133,6 +133,7 @@ pages.post('/', async (req, res) => {
     const result = isLoggedIn.authenticated ? await addPage({title, body, userId: isLoggedIn.userID, visible}) : isLoggedIn;
    
     const responseStatus = result.success ? 201 : 400;
+    res.set('Access-Control-Allow-Origin', '*')
     res.status(responseStatus).json(result);
 })
 

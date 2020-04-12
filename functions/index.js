@@ -6,7 +6,7 @@ admin.initializeApp();
 //Other imports
 const express = require('express');
 const cookieParser = require("cookie-parser")();
-const cors = require("cors")({ origin: true });
+const cors = require("cors")({ origin: '*' });
 
 
 //Pages
@@ -32,6 +32,7 @@ sideBlocks.use(cookieParser);
 
 //Auth
 const { auth } = require('./auth');
+auth.use(cors);
 auth.use(express.json());
 auth.use(express.urlencoded({ extended: true }));
 
