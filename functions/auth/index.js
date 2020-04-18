@@ -22,6 +22,7 @@ auth.get('/', async (req, res) => {
     const result = isLogedIn.authenticated ? await getAllUsers(parseInt(limit), nextPageToken) : isLogedIn;
     
     const resStatus = result.success ? 200 : 400;
+    res.set('Access-Control-Allow-Origin', '*');
     res.status(resStatus).json(result);
 });
 
@@ -31,15 +32,9 @@ auth.post('/', async (req, res) => {
     const result =  isLogedIn.authenticated ? await createUser(req) : isLogedIn;
 
     const resStatus = result.success ? 200 : 400;
+    res.set('Access-Control-Allow-Origin', '*');
     res.status(resStatus).json(result);
 });
-
-auth.post('/checkUserToken', async (req, res) => {
-    const isLogedIn = await authenticate(req);
-
-    const resStatus = isLogedIn.authenticated ? 200 : 401;
-    res.status(resStatus).json(isLogedIn);
-})
 
 //Update user
 auth.put('/:id', async (req, res) => {
@@ -47,6 +42,7 @@ auth.put('/:id', async (req, res) => {
     const result =  isLogedIn.authenticated ? await updateUser(req) : isLogedIn;
 
     const resStatus = result.success ? 200 : 400;
+    res.set('Access-Control-Allow-Origin', '*');
     res.status(resStatus).json(result);
 });
 
@@ -57,6 +53,7 @@ auth.delete('/:id', async (req, res) => {
     const result =  isLogedIn.authenticated ? await deleteUser(id) : isLogedIn;
     
     const resStatus = result.success ? 200 : 400;
+    res.set('Access-Control-Allow-Origin', '*')
     res.status(resStatus).json(result);
 });
 

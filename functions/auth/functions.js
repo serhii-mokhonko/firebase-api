@@ -11,6 +11,12 @@ exports.createUser = async (req) => {
             message: RESPONSE_MESSAGES.REJECT.AUTH.ERROREMAILORPASS
         }
 
+    if(password.length < 6)
+        return {
+            success: false,
+            message: RESPONSE_MESSAGES.REJECT.AUTH.LENGTH_OF_PASS
+        }
+
     //Create user
     try{
         await admin.auth().createUser({email, password, displayName, phoneNumber, emailVerified, disabled});
@@ -73,20 +79,22 @@ exports.updateUser = async (req) => {
     const { id } = req.params;
     let { email, password, displayName, phoneNumber, emailVerified, disabled } = req.body;
 
-    if(_.isEmpty(email) || _.isEmpty(password))
+    if(_.isEmpty(email))
         return {
             success: false,
             message: RESPONSE_MESSAGES.REJECT.AUTH.ERROREMAILORPASS
         };
-    
-    if(password.length < 6)
+
+    if(!_.isEmpty(password) && password.length < 6){
         return {
             success: false,
             message: RESPONSE_MESSAGES.REJECT.AUTH.LENGTH_OF_PASS
         }
+    }
 
     try{
-        await admin.auth().updateUser(id, { email, password, displayName, phoneNumber, emailVerified, disabled});
+        const newData = _.assign({}, { email, displayName, phoneNumber, emailVerified, disabled }, !_.isEmpty(password) && { password } ); 
+        await admin.auth().updateUser(id, newData);
         return {
             success: true,
             message: RESPONSE_MESSAGES.SUCCESS.AUTH.UPDATED
