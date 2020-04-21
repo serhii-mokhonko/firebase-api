@@ -30,9 +30,9 @@ news.post('/', async (req, res) => {
 
 news.put('/:key', async (req, res) => {
   const key = req.params.key;
-  const newData = req.body;
+  const { title, description, content } = req.body;
   const isLoggedIn = await authenticate(req);
-  const result = isLoggedIn.authenticated ? await editNews(key, newData) : isLoggedIn;
+  const result = isLoggedIn.authenticated ? await editNews(key, { title, description, content,  userIdUpdate: isLoggedIn.userID }) : isLoggedIn;
   res.set('Access-Control-Allow-Origin', '*');
   res.json(result);
 });

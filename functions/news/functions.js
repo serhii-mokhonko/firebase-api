@@ -80,13 +80,22 @@ exports.editNews = async (key, newData) => {
         return {
             success: false,
             message: RESPONSE_MESSAGES.REJECT.NEWS.ITEM_NOT_FOUND
-        }
+        };
+
+    if(!newData.title || !newData.content)
+        return {
+            success: false,
+            message: RESPONSE_MESSAGES.REJECT.NEWS.FIELDS_EMPTY
+        };
+
+    newData.description = newData.description || "";
+    newData.updated = Date.now();
 
     await admin.database().ref(`/news/${key}`).update(newData);
         return {
             success: true,
             message: RESPONSE_MESSAGES.SUCCESS.NEWS.EDITED,
-        }
+        };
 };
 
 exports.deleteNews = async (key) => {
