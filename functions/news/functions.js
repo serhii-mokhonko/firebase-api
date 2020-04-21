@@ -41,6 +41,20 @@ exports.getNews = async (startFrom, count) => {
     }
 };
 
+exports.getSingleRecord = async (key) => {
+    const record = await admin.database().ref('news').child(key).once('value');
+    if(!record.val())
+        return {
+            success: false,
+            message: RESPONSE_MESSAGES.REJECT.NEWS.ITEM_NOT_FOUND
+        };
+
+    return {
+        success: true,
+        data: record.val()
+    };
+}
+
 exports.addNews = async (data) => {
     data.created = Date.now();
     const snapshot = await admin.database().ref('/news').push(data);

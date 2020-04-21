@@ -1,12 +1,20 @@
 const express = require('express');
 const news = express();
-const { getNews, addNews, editNews, deleteNews } = require('./functions');
+const { getNews, getSingleRecord, addNews, editNews, deleteNews } = require('./functions');
 
 const { authenticate } = require('../authenticate');
 
 news.get('/', async (req, res) => {
   let { startFrom, count } = req.query;
   const result = await getNews(startFrom, count);
+  const status = result.success ? 200 : 400;
+  res.set('Access-Control-Allow-Origin', '*');
+  res.status(status).json(result);
+});
+
+news.get("/:key", async (req, res) => {
+  const key = req.params.key;
+  const result = await getSingleRecord(key);
   const status = result.success ? 200 : 400;
   res.set('Access-Control-Allow-Origin', '*');
   res.status(status).json(result);
