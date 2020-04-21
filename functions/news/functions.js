@@ -56,7 +56,15 @@ exports.getSingleRecord = async (key) => {
 }
 
 exports.addNews = async (data) => {
+    if(!data.title || !data.content)
+        return {
+            success: false,
+            message: RESPONSE_MESSAGES.REJECT.NEWS.FIELDS_EMPTY
+        };
+    
+    data.description = data.description || "";
     data.created = Date.now();
+
     const snapshot = await admin.database().ref('/news').push(data);
 
     return {
