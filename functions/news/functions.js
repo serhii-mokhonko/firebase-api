@@ -63,7 +63,7 @@ exports.addNews = async (data) => {
         };
     
     data.description = data.description || "";
-    data.visible = data.visible === undefined ? true : data.visible;
+    data.visible = !_.isBoolean(data.visible) ? true : data.visible;
     data.created = Date.now();
 
     const snapshot = await admin.database().ref('/news').push(data);
@@ -90,7 +90,7 @@ exports.editNews = async (key, newData) => {
         };
 
     newData.description = newData.description || "";
-    newData.visible = newData.visible === undefined ? true : newData.visible;
+    newData.visible = !_.isBoolean(data.visible) ? true : newData.visible;
     newData.updated = Date.now();
 
     await admin.database().ref(`/news/${key}`).update(newData);
