@@ -90,6 +90,7 @@ exports.editNews = async (key, newData) => {
         };
 
     newData.description = newData.description || "";
+    newData.visible = newData.visible === undefined ? true : newData.visible;
     newData.updated = Date.now();
 
     await admin.database().ref(`/news/${key}`).update(newData);
