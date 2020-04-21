@@ -63,6 +63,7 @@ exports.addNews = async (data) => {
         };
     
     data.description = data.description || "";
+    data.visible = data.visible === undefined ? true : data.visible;
     data.created = Date.now();
 
     const snapshot = await admin.database().ref('/news').push(data);
