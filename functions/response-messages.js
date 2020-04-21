@@ -21,6 +21,10 @@ const RESPONSE_MESSAGES = {
             WRITETODB: "The information is not recorded to the database",
             NOT_DELETE: "File can't delete or file doesn't exist",
             GET_DATA: "Can't get data or data doesn't exist"
+        },
+        NEWS: {
+            NOT_FOUND: "Can't get list of records",
+            ITEM_NOT_FOUND: 'Record not found',
         }
     },
     SUCCESS: {
@@ -38,6 +42,11 @@ const RESPONSE_MESSAGES = {
             UPLOADED: 'File uploaded',
             WRITETODB: "The information successfully has written to database",
             DELETED: "File deleted"
+        },
+        NEWS: {
+            CREATED: 'Record successfully created',
+            EDITED: 'Record successfully updated',
+            DELETED: "Record successfully deleted",
         }
     }
 };

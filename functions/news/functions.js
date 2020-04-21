@@ -13,7 +13,7 @@ exports.getNews = async (startFrom, count) => {
     if(!data)
         return {
             success: false,
-            massege: RESPONSE_MESSAGES.REJECT.PAGES.NOT_FOUND
+            massege: RESPONSE_MESSAGES.REJECT.NEWS.NOT_FOUND
         }
 
     const transformedData = transformData(data);
@@ -32,7 +32,7 @@ exports.addNews = async (data) => {
 
     return {
         success: true,
-        message: RESPONSE_MESSAGES.SUCCESS.PAGES.CREATED,
+        message: RESPONSE_MESSAGES.SUCCESS.NEWS.CREATED,
         key: snapshot.key
     }
 };
@@ -42,22 +42,29 @@ exports.editNews = async (key, newData) => {
     if(!value) 
         return {
             success: false,
-            message: RESPONSE_MESSAGES.REJECT.PAGES.KEY_NOT_FOUND
+            message: RESPONSE_MESSAGES.REJECT.NEWS.ITEM_NOT_FOUND
         }
 
     await admin.database().ref(`/news/${key}`).update(newData);
         return {
             success: true,
-            message: RESPONSE_MESSAGES.SUCCESS.PAGES.EDITED,
+            message: RESPONSE_MESSAGES.SUCCESS.NEWS.EDITED,
         }
 };
 
 exports.deleteNews = async (key) => {
-    await admin.database().ref(`/news/${key}`).remove()
+    const value = await checkValue(key, 'news');
+    if(!value) 
+        return {
+            success: false,
+            message: RESPONSE_MESSAGES.REJECT.NEWS.ITEM_NOT_FOUND
+        };
+    
+    await admin.database().ref(`/news/${key}`).remove();
     return {
         success: true,
-        message: RESPONSE_MESSAGES.SUCCESS.PAGES.DELETED,
-    }
+        message: RESPONSE_MESSAGES.SUCCESS.NEWS.DELETED,
+    };
 };
 
 const transformData = (obj) => {
