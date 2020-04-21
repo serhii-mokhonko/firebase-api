@@ -25,6 +25,8 @@ const RESPONSE_MESSAGES = {
         NEWS: {
             NOT_FOUND: "Can't get list of records",
             ITEM_NOT_FOUND: 'Record not found',
+            PARAMS_NOT_SET: "Set right params for query",
+            OUT_OF_RANGE: "Params out of range"
         }
     },
     SUCCESS: {

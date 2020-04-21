@@ -8,6 +8,12 @@ const checkValue = async (key, ref) => {
 }
 
 exports.getNews = async (startFrom, count) => {
+    if(_.isEmpty(startFrom) || _.isEmpty(count))
+        return{
+            success: false,
+            message: RESPONSE_MESSAGES.REJECT.NEWS.PARAMS_NOT_SET
+        };
+
     const snapshot = await admin.database().ref('/news').once('value');
     const data = snapshot.val();
     if(!data)
@@ -17,7 +23,16 @@ exports.getNews = async (startFrom, count) => {
         }
 
     const transformedData = transformData(data);
-    const result = transformedData.splice(startFrom, count);
+    const begin = parseInt(startFrom);
+    const end = parseInt(startFrom) + parseInt(count)
+    
+    if(begin >= transformedData.length)
+        return {
+            success: false,
+            message: RESPONSE_MESSAGES.REJECT.NEWS.OUT_OF_RANGE
+        }
+    
+    const result = transformedData.slice(begin, end);
     
     return {
         success: true,
