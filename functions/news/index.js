@@ -5,8 +5,8 @@ const { getNews, getSingleRecord, addNews, editNews, deleteNews } = require('./f
 const { authenticate } = require('../authenticate');
 
 news.get('/', async (req, res) => {
-  let { startFrom, count } = req.query;
-  const result = await getNews(startFrom, count);
+  let { startAt, itemsOnPage } = req.query;
+  const result = await getNews(startAt, itemsOnPage);
   const status = result.success ? 200 : 400;
   res.set('Access-Control-Allow-Origin', '*');
   res.status(status).json(result);

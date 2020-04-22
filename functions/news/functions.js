@@ -7,37 +7,47 @@ const checkValue = async (key, ref) => {
     return snapshot.val();
 }
 
-exports.getNews = async (startFrom, count) => {
-    if(_.isEmpty(startFrom) || _.isEmpty(count))
+exports.getNews = async (startAt, count) => {
+    if(_.isEmpty(startAt) || _.isEmpty(count))
         return{
             success: false,
             message: RESPONSE_MESSAGES.REJECT.NEWS.PARAMS_NOT_SET
         };
 
-    const snapshot = await admin.database().ref('/news').once('value');
-    const data = snapshot.val();
-    if(!data)
-        return {
-            success: false,
-            massege: RESPONSE_MESSAGES.REJECT.NEWS.NOT_FOUND
-        }
+    try {
+        const dbRecords =  await admin.database().ref('/news').once('value');
+        const keys = Object.keys(dbRecords.val()).reverse();
+        const key = keys[parseInt(startAt)]
 
-    const transformedData = transformData(data);
-    const begin = parseInt(startFrom);
-    const end = parseInt(startFrom) + parseInt(count)
+        if(parseInt(startAt) >= keys.length)
+            return {
+                success: false,
+                message: RESPONSE_MESSAGES.REJECT.NEWS.OUT_OF_RANGE
+            };
     
-    if(begin >= transformedData.length)
+        const query = admin.database().ref('/news').orderByKey().limitToLast(parseInt(count)).endAt(key);
+        const snapshot = await query.once('value');
+        const data = snapshot.val();
+        if(!data)
+            return {
+                success: false,
+                massege: RESPONSE_MESSAGES.REJECT.NEWS.NOT_FOUND
+            };
+
+        const transformedData = transformData(data);
+
+        return {
+            success: true,
+            data: transformedData.reverse(),
+            newsCount: keys.length
+        };
+
+    } catch (err) {
         return {
             success: false,
-            message: RESPONSE_MESSAGES.REJECT.NEWS.OUT_OF_RANGE
+            error: err.message,
+            message: RESPONSE_MESSAGES.REJECT.NEWS.GET_DATA
         }
-    
-    const result = transformedData.slice(begin, end);
-    
-    return {
-        success: true,
-        data: result,
-        newsCount: transformedData.length
     }
 };
 
