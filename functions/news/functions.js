@@ -51,6 +51,54 @@ exports.getNews = async (startAt, count) => {
     }
 };
 
+exports.searchNews = async (str, startAt, itemsOnPage) => {
+    const searchStr =  _.toLower(str);
+    let result;
+    try{
+        const query = await admin.database().ref('news').once('value');
+        const data = query.val();
+        const transformedData = transformData(data);
+
+        result = transformedData.filter(el => {
+            const title =  _.toLower(el.title);
+            const content = _.toLower(el.content);
+
+            return ( title.includes(searchStr) || content.includes(searchStr) );
+        });
+
+    }catch(err) {
+        return {
+            success: false,
+            message: RESPONSE_MESSAGES.REJECT.SEARCH.ERROR,
+            error: err.message
+        };
+    }
+
+    if(result.length > 0) {
+        if(!_.isEmpty(startAt) || !_.isEmpty(itemsOnPage)) {
+            const start = parseInt(startAt);
+            const end = start + parseInt(itemsOnPage);
+            const cuttedOutResult = result.slice(start, end);
+            return {
+                success: true,
+                data: cuttedOutResult,
+                count: result.length
+            };
+        }
+
+        return {
+            success: true,
+            data: result,
+            count: result.length
+        };
+    }
+
+    return {
+        success: false,
+        message: RESPONSE_MESSAGES.REJECT.SEARCH.NOT_FOUND
+    };
+};
+
 exports.getSingleRecord = async (key) => {
     const record = await admin.database().ref('news').child(key).once('value');
     if(!record.val())

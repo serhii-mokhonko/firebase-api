@@ -29,6 +29,10 @@ const RESPONSE_MESSAGES = {
             OUT_OF_RANGE: "Params out of range",
             FIELDS_EMPTY: "Title or content of record are empty",
             GET_DATA: "Can't get records or data doesn't exist"
+        },
+        SEARCH: {
+            NOT_FOUND: "Not found",
+            ERROR: "Cant get data from database"
         }
     },
     SUCCESS: {

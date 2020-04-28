@@ -1,12 +1,19 @@
+const _ = require('lodash');
 const express = require('express');
 const news = express();
-const { getNews, getSingleRecord, addNews, editNews, deleteNews } = require('./functions');
+const { getNews, getSingleRecord, addNews, editNews, deleteNews, searchNews } = require('./functions');
 
 const { authenticate } = require('../authenticate');
 
 news.get('/', async (req, res) => {
-  let { startAt, itemsOnPage } = req.query;
-  const result = await getNews(startAt, itemsOnPage);
+  let { startAt, itemsOnPage, q } = req.query;
+  let result;
+  if(!_.isEmpty(q)){
+    result = await searchNews(q, startAt, itemsOnPage);
+  } else {
+    result = await getNews(startAt, itemsOnPage);
+  }
+
   const status = result.success ? 200 : 400;
   res.set('Access-Control-Allow-Origin', '*');
   res.status(status).json(result);
