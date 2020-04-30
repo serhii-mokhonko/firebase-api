@@ -81,8 +81,8 @@ exports.searchNews = async (str, startAt, itemsOnPage) => {
             const cuttedOutResult = result.slice(start, end);
             return {
                 success: true,
-                data: cuttedOutResult,
-                count: result.length
+                data: cuttedOutResult.reverse(),
+                newsCount: result.length
             };
         }
 
@@ -148,7 +148,7 @@ exports.editNews = async (key, newData) => {
         };
 
     newData.description = newData.description || "";
-    newData.visible = !_.isBoolean(data.visible) ? true : newData.visible;
+    newData.visible = !_.isBoolean(newData.visible) ? true : newData.visible;
     newData.updated = Date.now();
 
     await admin.database().ref(`/news/${key}`).update(newData);
