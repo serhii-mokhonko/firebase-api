@@ -59,7 +59,7 @@ exports.searchNews = async (str, startAt, itemsOnPage) => {
         const data = query.val();
         const transformedData = transformData(data);
 
-        result = transformedData.filter(el => {
+        result = transformedData.reverse().filter(el => {
             const title =  _.toLower(el.title);
             const content = _.toLower(el.content);
 
@@ -81,7 +81,7 @@ exports.searchNews = async (str, startAt, itemsOnPage) => {
             const cuttedOutResult = result.slice(start, end);
             return {
                 success: true,
-                data: cuttedOutResult.reverse(),
+                data: cuttedOutResult,
                 newsCount: result.length
             };
         }
