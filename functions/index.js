@@ -57,7 +57,8 @@ exports.news = functions.https.onRequest(news);
 exports.sideBlocks = functions.https.onRequest(sideBlocks);
 exports.siteInfo = functions.https.onRequest(siteInfo);
 
-const { deleteFromBucket, uploadFile } = require('./gallery/trigers');
+const { deleteFromBucket, deleteTitleImage } = require('./gallery/trigers');
 
 // trigers
 exports.deleteFromBucket =  functions.storage.object().onDelete(deleteFromBucket);
+exports.deleteTitleImage =  functions.storage.object().onDelete(deleteTitleImage);
