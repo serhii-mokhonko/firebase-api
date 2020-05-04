@@ -30,6 +30,29 @@ exports.writeToDb = async (id, data, description='') => {
     }
 };
 
+exports.updatePhotoUrl = async (id, url) => {
+    if(_.isEmpty(id) || _.isEmpty(url))
+        return {
+            success: false,
+            message: RESPONSE_MESSAGES.REJECT.GALLERY.WRITETODB
+        };
+
+    try {
+        await admin.database().ref(`/news/${id}`).update({ photoUrl: url });
+        return {
+            success: true,
+            message: RESPONSE_MESSAGES.SUCCESS.GALLERY.WRITETODB
+        }
+    } catch (err) {
+        console.log(err);
+
+        return {
+            success: false,
+            message: RESPONSE_MESSAGES.REJECT.GALLERY.WRITETODB
+        }
+    }
+};
+
 exports.uploadFile = (req, bucket, id) => {
     return new Promise((resolve) => {
         const busboy = new Busboy({ headers: req.headers });

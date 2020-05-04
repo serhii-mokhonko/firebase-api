@@ -1,6 +1,6 @@
 const express = require('express');
 const gallery = express();
-const { createRecord, writeToDb, uploadFile, deleteFile, getListsOfFiles } = require('./functions');
+const { createRecord, writeToDb, uploadFile, deleteFile, getListsOfFiles, updatePhotoUrl } = require('./functions');
 
 
 //Bucket config
@@ -35,7 +35,7 @@ gallery.post('/', async (req, res) => {
       dbKey: id,
       info: fileUploadResult.result
     };
-  }else {
+  } else {
     result = {
       success: false,
       messages: [
@@ -43,6 +43,38 @@ gallery.post('/', async (req, res) => {
         dbWriteDataResult.message
       ]
     };
+  }
+
+  const status = result.success ? 200 : 500;
+  res.status(status).json(result);
+});
+
+gallery.post("/news/:id", async (req, res) => {
+  const { id } = req.params;
+
+  let result,  dbWriteDataResult;
+  const fileUploadResult = await uploadFile(req, bucket, id);
+  
+  if(fileUploadResult.success) {
+    dbWriteDataResult = await updatePhotoUrl(id, fileUploadResult.result.url);
+  }
+
+  if(fileUploadResult.success && dbWriteDataResult.success) {
+    result = {
+      success: true,
+      messages: [
+        fileUploadResult.message,
+        dbWriteDataResult.message
+      ],
+    }
+  } else {
+    result = {
+      success: false,
+      messages: [
+        fileUploadResult.message,
+        dbWriteDataResult.message
+      ]
+    }
   }
 
   const status = result.success ? 200 : 500;
