@@ -29,9 +29,9 @@ news.get("/:key", async (req, res) => {
 
 news.post('/', async (req, res) => {
   const isLoggedIn = await authenticate(req);
-  const { title, description, content, photoUrl, visible } = req.body;
+  const { title, description, content, photo, visible } = req.body;
   const result = isLoggedIn.authenticated 
-    ? await addNews({ title, content, photoUrl, authorId: isLoggedIn.userID, description, visible }) 
+    ? await addNews({ title, content, photo, authorId: isLoggedIn.userID, description, visible }) 
     : isLoggedIn;
   res.set('Access-Control-Allow-Origin', '*');
   res.json(result);
@@ -39,10 +39,10 @@ news.post('/', async (req, res) => {
 
 news.put('/:key', async (req, res) => {
   const key = req.params.key;
-  const { title, description, photoUrl, content, visible } = req.body;
+  const { title, description, photo, content, visible } = req.body;
   const isLoggedIn = await authenticate(req);
   const result = isLoggedIn.authenticated 
-    ? await editNews(key, { title, description, content, photoUrl, userIdUpdate: isLoggedIn.userID, visible }) 
+    ? await editNews(key, { title, description, content, photo, userIdUpdate: isLoggedIn.userID, visible }) 
     : isLoggedIn;
   res.set('Access-Control-Allow-Origin', '*');
   res.json(result);

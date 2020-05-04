@@ -121,7 +121,7 @@ exports.addNews = async (data) => {
         };
     
     data.description = data.description || "";
-    data.photoUrl = data.photoUrl || "";
+    data.photo = data.photo || {};
     data.visible = !_.isBoolean(data.visible) ? true : data.visible;
     data.created = Date.now();
 
@@ -149,7 +149,7 @@ exports.editNews = async (key, newData) => {
         };
 
     newData.description = newData.description || "";
-    newData.photoUrl = newData.photoUrl || "";
+    newData.photo = newData.photo || {};
     newData.visible = !_.isBoolean(newData.visible) ? true : newData.visible;
     newData.updated = Date.now();
 
