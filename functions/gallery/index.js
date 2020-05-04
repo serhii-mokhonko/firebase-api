@@ -56,7 +56,8 @@ gallery.post("/news/:id", async (req, res) => {
   const fileUploadResult = await uploadFile(req, bucket, id);
   
   if(fileUploadResult.success) {
-    dbWriteDataResult = await updatePhotoUrl(id, fileUploadResult.result.url);
+    const { filename, url } = fileUploadResult.result;
+    dbWriteDataResult = await updatePhotoUrl(id, { filename, url });
   }
 
   if(fileUploadResult.success && dbWriteDataResult.success) {
@@ -84,6 +85,14 @@ gallery.post("/news/:id", async (req, res) => {
 gallery.delete('/:fileName', async (req, res) => {
   const { fileName } = req.params;
 
+  const result = await deleteFile(fileName, bucket);
+
+  const status = result.success ? 200 : 400;
+  res.status(status).json(result);
+});
+
+gallery.delete("/news/:fileName", async (req, res) => {
+  const { fileName } = req.params;
   const result = await deleteFile(fileName, bucket);
 
   const status = result.success ? 200 : 400;
