@@ -33,7 +33,7 @@ exports.pages = functions.https.onRequest(pages);
 exports.auth = functions.https.onRequest(auth);
 exports.gallery = functions.https.onRequest(gallery);
 
-const { deleteFromBucket, uploadFile } = require('./gallery/trigers');
+const { deleteFromBucket } = require('./gallery/trigers');
 
 // trigers
 exports.deleteFromBucket =  functions.storage.object().onDelete(deleteFromBucket);
