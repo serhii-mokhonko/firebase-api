@@ -48,6 +48,41 @@ gallery.post('/', async (req, res) => {
   }
 
   const status = result.success ? 200 : 500;
+  res.set('Access-Control-Allow-Origin', '*');
+  res.status(status).json(result);
+});
+
+gallery.post("/news/:id", async (req, res) => {
+  const { id } = req.params;
+
+  let result,  dbWriteDataResult;
+  const fileUploadResult = await uploadFile(req, bucket, id);
+  
+  if(fileUploadResult.success) {
+    const { filename, url } = fileUploadResult.result;
+    dbWriteDataResult = await updatePhotoUrl(id, { filename, url });
+  }
+
+  if(fileUploadResult.success && dbWriteDataResult.success) {
+    result = {
+      success: true,
+      messages: [
+        fileUploadResult.message,
+        dbWriteDataResult.message
+      ],
+    }
+  } else {
+    result = {
+      success: false,
+      messages: [
+        fileUploadResult.message,
+        dbWriteDataResult.message
+      ]
+    }
+  }
+
+  const status = result.success ? 200 : 500;
+  res.set('Access-Control-Allow-Origin', '*');
   res.status(status).json(result);
 });
 
@@ -57,6 +92,7 @@ gallery.delete('/:fileName', async (req, res) => {
   const result = await deleteFile(fileName, bucket);
 
   const status = result.success ? 200 : 400;
+  res.set('Access-Control-Allow-Origin', '*');
   res.status(status).json(result);
 });
 
@@ -65,6 +101,7 @@ gallery.get('/', async (req, res) => {
   const result = await getListsOfFiles(parseInt(itemOnPage), parseInt(start));
 
   const status = result.success ? 200 : 400;
+  res.set('Access-Control-Allow-Origin', '*');
   res.status(status).json(result);
 });
 
