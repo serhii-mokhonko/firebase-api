@@ -42,7 +42,7 @@ news.put('/:key', async (req, res) => {
   const { title, description, content, visible } = req.body;
   const isLoggedIn = await authenticate(req);
   const result = isLoggedIn.authenticated 
-    ? await editNews(key, { title, description, content, userIdUpdate: isLoggedIn.userID, visible }) 
+    ? await editNews(key, { title, description, content, photo, userIdUpdate: isLoggedIn.userID, visible }) 
     : isLoggedIn;
   res.set('Access-Control-Allow-Origin', '*');
   res.json(result);
