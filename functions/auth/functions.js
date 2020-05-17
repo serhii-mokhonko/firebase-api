@@ -1,100 +1,44 @@
 const admin = require('firebase-admin');
 const _ = require('lodash');
-const { RESPONSE_MESSAGES } = require('../response-messages.js');
+const fetch = require("node-fetch");
+const { RESPONSE_MESSAGES } = require("./response-messages");
 
-exports.createUser = async (req) => {
-    let {email, password, displayName, phoneNumber, emailVerified, disabled} = req.body;
-
-    if(_.isEmpty(email) || _.isEmpty(password))
+exports.updateToken = async (api, refreshToken) => {
+    if (_.isEmpty(api))
         return {
             success: false,
-            message: RESPONSE_MESSAGES.REJECT.AUTH.ERROREMAILORPASS
+            message: RESPONSE_MESSAGES.REJECT.NOT_API
         }
 
-    //Create user
-    try{
-        await admin.auth().createUser({email, password, displayName, phoneNumber, emailVerified, disabled});
+    if (_.isEmpty(refreshToken))
+        return {
+            success: false,
+            message: RESPONSE_MESSAGES.REJECT.NOT_REFRESH_TOKEN
+        }
+
+    const url = `https://securetoken.googleapis.com/v1/token?key=${api}`;
+    const data = {
+        grant_type: "refresh_token",
+        refresh_token: refreshToken
+    };
+
+    const options = {
+        method: "POST",
+        body: JSON.stringify(data)
+    };
+
+    try {
+        const query = await fetch(url, options);
+        const res = await query.json();
         return {
             success: true,
-            message: RESPONSE_MESSAGES.SUCCESS.AUTH.CREATED
+            data: res
         }
-
-    }catch(e){
+    } catch (err) {
         return {
             success: false,
-            message: e.message
-        }
-
-    }
-};
-
-exports.getAllUsers = async (limit, pageToken) => {
-    const users = [];
-    try{
-        const listUsers = await admin.auth().listUsers(limit, pageToken);
-        listUsers.users.forEach(el => {
-            users.push(el);
-        });
-            if(listUsers.pageToken)
-                return {
-                    success: true,
-                    result: users,
-                    nextPage: listUsers.pageToken
-                }
-
-            return {
-                success: true,
-                result: users
-            }
-    }catch(e){
-        return {
-            success: false,
-            message: RESPONSE_MESSAGES.REJECT.AUTH.USERS_LIST
+            message: RESPONSE_MESSAGES.REJECT.ERROR,
+            error: err.message
         }
     }
-};
-
-exports.deleteUser = async (id) => {
-    try{
-        await admin.auth().deleteUser(id);
-        return {
-            success: true,
-            message: RESPONSE_MESSAGES.SUCCESS.AUTH.DELETED
-        }
-    }catch(e){
-        return {
-            success: false,
-            message: RESPONSE_MESSAGES.REJECT.AUTH.NOT_DELETE
-        }
-    }
-};
-
-exports.updateUser = async (req) => {
-    const { id } = req.params;
-    let { email, password, displayName, phoneNumber, emailVerified, disabled } = req.body;
-
-    if(_.isEmpty(email) || _.isEmpty(password))
-        return {
-            success: false,
-            message: RESPONSE_MESSAGES.REJECT.AUTH.ERROREMAILORPASS
-        };
-    
-    if(password.length < 6)
-        return {
-            success: false,
-            message: RESPONSE_MESSAGES.REJECT.AUTH.LENGTH_OF_PASS
-        }
-
-    try{
-        await admin.auth().updateUser(id, { email, password, displayName, phoneNumber, emailVerified, disabled});
-        return {
-            success: true,
-            message: RESPONSE_MESSAGES.SUCCESS.AUTH.UPDATED
-        }
-    }catch(e){
-        return {
-            success: false,
-            message: e.message
-        }
-    }
-};
+}
