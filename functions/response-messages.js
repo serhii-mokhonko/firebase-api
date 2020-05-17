@@ -8,14 +8,6 @@ const RESPONSE_MESSAGES = {
             KEY_NOT_FOUND: 'Key not found',
             ERRORUSER: 'User does not exist'
         },
-        AUTH: {
-            ERROREMAILORPASS: "Email and password are required",
-            NOT_CREATED: "User can't be created",
-            USERS_LIST: "Can't get list of users",
-            NOT_DELETE: "Can't delete this user",
-            NOT_UPDATE: "Sorry! Can't update user.",
-            LENGTH_OF_PASS: "Password must contain minimum 6 characters"
-        },
         GALLERY: {
             NOT_FILE: 'File does not exist',
             WRITETODB: "The information is not recorded to the database",
@@ -40,11 +32,6 @@ const RESPONSE_MESSAGES = {
             CREATED: 'Page successfully created',
             DELETED: 'Page successfully deleted',
             EDITED: 'Page successfully updated'
-        },
-        AUTH: {
-            CREATED: "User successfully created",
-            DELETED: "User successfully deleted",
-            UPDATED: "User successfully updated"
         },
         GALLERY: {
             UPLOADED: 'File uploaded',
