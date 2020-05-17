@@ -24,13 +24,13 @@ exports.signIn = async (api, email, password) => {
     if (_.isEmpty(api))
         return {
             success: false,
-            message: RESPONSE_MESSAGES.REJECT.NOT_EMAIL_OR_PASS
+            message: RESPONSE_MESSAGES.REJECT.NOT_API
         }
 
     if (_.isEmpty(email) || _.isEmpty(password))
         return {
             success: false,
-            message: RESPONSE_MESSAGES.REJECT.NOT_REFRESH_TOKEN
+            message: RESPONSE_MESSAGES.REJECT.NOT_EMAIL_OR_PASS
         }
 
     const url = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${api}`;
@@ -45,7 +45,26 @@ exports.signIn = async (api, email, password) => {
         body: JSON.stringify(data)
     };
 
-    return await query(url, options);
+    try {
+        const query = await fetch(url, options);
+        const res = await query.json();
+        if (res.error)
+            return {
+                success: false,
+                message: res.error.message
+            }
+
+        return {
+            success: true,
+            data: res
+        }
+    } catch (err) {
+        return {
+            success: false,
+            message: RESPONSE_MESSAGES.REJECT.ERROR,
+            error: err.message
+        }
+    }
 };
 
 exports.updateToken = async (api, refreshToken) => {
