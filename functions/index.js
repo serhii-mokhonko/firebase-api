@@ -42,7 +42,7 @@ gallery.use(cors);
 gallery.use(express.json());
 gallery.use(express.urlencoded({ extended: true }));
 
-//Gallery
+// Site Info
 const { siteInfo } = require('./site-info');
 siteInfo.use(cors);
 siteInfo.use(express.json());
