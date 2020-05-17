@@ -1,48 +1,14 @@
 const express = require('express');
 const auth = express();
 const _ = require('lodash');
-const { authenticate } = require('../authenticate');
-const { createUser, getAllUsers, deleteUser, updateUser } = require('./functions');
+const { updateToken } = require("./functions");
 
-//List of all users
-auth.get('/', async (req, res) => {
-    let { limit, nextPageToken } = req.query;
-    limit = _.isEmpty(limit) ? 1000 : limit;
-    
-    const isLogedIn = await authenticate(req);
-    const result = isLogedIn.authenticated ? await getAllUsers(parseInt(limit), nextPageToken) : isLogedIn;
-    
-    const resStatus = result.success ? 200 : 400;
-    res.status(resStatus).json(result);
+// refresh token
+auth.post('/refresh-token', async (req, res) => {
+    const { api } = req.query;
+    const { refreshToken } = req.body;
+    const result = await updateToken(api, refreshToken);
+    res.status(200).json(result);
 });
-
-//Create new user
-auth.post('/', async (req, res) => {
-    const isLogedIn = await authenticate(req);
-    const result =  isLogedIn.authenticated ? await createUser(req) : isLogedIn;
-
-    const resStatus = result.success ? 200 : 400;
-    res.status(resStatus).json(result);
-});
-
-//Update user
-auth.put('/:id', async (req, res) => {
-    const isLogedIn = await authenticate(req);
-    const result =  isLogedIn.authenticated ? await updateUser(req) : isLogedIn;
-
-    const resStatus = result.success ? 200 : 400;
-    res.status(resStatus).json(result);
-});
-
-//Delete user
-auth.delete('/:id', async (req, res) => {
-    const isLogedIn = await authenticate(req);
-    const { id } = req.params;
-    const result =  isLogedIn.authenticated ? await deleteUser(id) : isLogedIn;
-    
-    const resStatus = result.success ? 200 : 400;
-    res.status(resStatus).json(result);
-});
-
 
 exports.auth = auth;

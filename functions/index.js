@@ -20,6 +20,7 @@ pages.use(cookieParser);
 const { auth } = require('./auth');
 auth.use(express.json());
 auth.use(express.urlencoded({ extended: true }));
+auth.use(cors);
 
 
 //Main exports for Firebase
