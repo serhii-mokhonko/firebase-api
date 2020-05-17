@@ -7,6 +7,12 @@ const query = async (url, options) => {
     try {
         const query = await fetch(url, options);
         const res = await query.json();
+        if (res.error)
+            return {
+                success: false,
+                message: res.error.message
+            }
+
         return {
             success: true,
             data: res
@@ -45,26 +51,7 @@ exports.signIn = async (api, email, password) => {
         body: JSON.stringify(data)
     };
 
-    try {
-        const query = await fetch(url, options);
-        const res = await query.json();
-        if (res.error)
-            return {
-                success: false,
-                message: res.error.message
-            }
-
-        return {
-            success: true,
-            data: res
-        }
-    } catch (err) {
-        return {
-            success: false,
-            message: RESPONSE_MESSAGES.REJECT.ERROR,
-            error: err.message
-        }
-    }
+    return await query(url, options);
 };
 
 exports.updateToken = async (api, refreshToken) => {
