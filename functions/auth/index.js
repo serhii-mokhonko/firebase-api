@@ -1,7 +1,7 @@
 const express = require('express');
 const auth = express();
 const _ = require('lodash');
-const { signIn, updateToken } = require("./functions");
+const { signIn, updateToken, checkToken } = require("./functions");
 
 // sign in
 auth.post('/sign-in', async (req, res) => {
@@ -20,6 +20,13 @@ auth.post('/refresh-token', async (req, res) => {
     const result = await updateToken(api, refreshToken);
     const status = result.success ? 200 : 400;
     res.set('Access-Control-Allow-Origin', '*');
+    res.status(status).json(result);
+});
+
+auth.get("/", async (req, res) => {
+    const { token } = req.query;
+    const result = await checkToken(token);
+    const status = result.success ? 200 : 400;
     res.status(status).json(result);
 });
 

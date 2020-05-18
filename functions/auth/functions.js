@@ -80,3 +80,24 @@ exports.updateToken = async (api, refreshToken) => {
 
     return await query(url, options);
 };
+
+exports.checkToken = async (token) => {
+    if (!token)
+        return {
+            success: false,
+            message: RESPONSE_MESSAGES.REJECT.NOT_TOKEN
+        };
+    try {
+        const decodedToken = await admin.auth().verifyIdToken(token);
+        if(decodedToken.uid)
+            return {
+                success: true,
+                uid: decodedToken.uid
+            }
+    } catch (err) {
+        return {
+            success: false,
+            message: err.message,
+        }
+    }
+};
