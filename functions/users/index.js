@@ -13,6 +13,7 @@ users.get('/', async (req, res) => {
     const result = isLogedIn.authenticated ? await getAllUsers(parseInt(limit), nextPageToken) : isLogedIn;
     
     const resStatus = result.success ? 200 : 400;
+    res.set('Access-Control-Allow-Origin', '*');
     res.status(resStatus).json(result);
 });
 
@@ -22,6 +23,7 @@ users.post('/', async (req, res) => {
     const result =  isLogedIn.authenticated ? await createUser(req) : isLogedIn;
 
     const resStatus = result.success ? 200 : 400;
+    res.set('Access-Control-Allow-Origin', '*');
     res.status(resStatus).json(result);
 });
 
@@ -31,6 +33,7 @@ users.put('/:id', async (req, res) => {
     const result =  isLogedIn.authenticated ? await updateUser(req) : isLogedIn;
 
     const resStatus = result.success ? 200 : 400;
+    res.set('Access-Control-Allow-Origin', '*');
     res.status(resStatus).json(result);
 });
 
@@ -41,6 +44,7 @@ users.delete('/:id', async (req, res) => {
     const result =  isLogedIn.authenticated ? await deleteUser(id) : isLogedIn;
     
     const resStatus = result.success ? 200 : 400;
+    res.set('Access-Control-Allow-Origin', '*');
     res.status(resStatus).json(result);
 });
 
