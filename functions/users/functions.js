@@ -16,7 +16,7 @@ exports.createUser = async (req) => {
         await admin.auth().createUser({email, password, displayName, phoneNumber, emailVerified, disabled});
         return {
             success: true,
-            message: RESPONSE_MESSAGES.AUTH.CREATED
+            message: RESPONSE_MESSAGES.SUCCESS.CREATED
         }
 
     }catch(e){
@@ -71,22 +71,24 @@ exports.deleteUser = async (id) => {
 
 exports.updateUser = async (req) => {
     const { id } = req.params;
-    let { email, password, displayName, phoneNumber, emailVerified, disabled } = req.body;
-
-    if(_.isEmpty(email) || _.isEmpty(password))
-        return {
-            success: false,
-            message: RESPONSE_MESSAGES.REJECT.ERROREMAILORPASS
-        };
+    const { email, password, displayName, disabled } = req.body;
     
-    if(password.length < 6)
+    if(_.isEmpty(email))
         return {
             success: false,
-            message: RESPONSE_MESSAGES.REJECT.LENGTH_OF_PASS
-        }
+            message: RESPONSE_MESSAGES.REJECT.NOT_EMAIL
+        };
+
+    const userData = {
+        displayName,
+        email,
+        disabled
+    };
+
+    const newUserData = !_.isEmpty(password) ? Object.assign({}, userData, { password }) : userData;
 
     try{
-        await admin.auth().updateUser(id, { email, password, displayName, phoneNumber, emailVerified, disabled});
+        await admin.auth().updateUser(id, newUserData);
         return {
             success: true,
             message: RESPONSE_MESSAGES.SUCCESS.UPDATED

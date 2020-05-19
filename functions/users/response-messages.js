@@ -1,6 +1,7 @@
 const RESPONSE_MESSAGES = {
     REJECT: {
         ERROREMAILORPASS: "Email and password are required",
+        NOT_EMAIL: "Email is required",
         NOT_CREATED: "User can't be created",
         USERS_LIST: "Can't get list of users",
         NOT_DELETE: "Can't delete this user",

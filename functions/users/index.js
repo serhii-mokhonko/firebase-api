@@ -39,7 +39,7 @@ users.put('/:id', async (req, res) => {
 
 //Delete user
 users.delete('/:id', async (req, res) => {
-    const isLogedIn = await usersenticate(req);
+    const isLogedIn = await authenticate(req);
     const { id } = req.params;
     const result =  isLogedIn.authenticated ? await deleteUser(id) : isLogedIn;
     
