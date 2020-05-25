@@ -23,6 +23,12 @@ news.use(express.urlencoded({ extended: true }));
 news.use(cors);
 news.use(cookieParser);
 
+//Categories
+const { categories } = require('./categories');
+categories.use(express.json());
+categories.use(express.urlencoded({ extended: true }));
+categories.use(cors);
+
 //Side Blocks
 const { sideBlocks } = require('./side-blocks');
 sideBlocks.use(express.json());
@@ -61,6 +67,7 @@ exports.auth = functions.https.onRequest(auth);
 exports.users = functions.https.onRequest(users);
 exports.gallery = functions.https.onRequest(gallery);
 exports.news = functions.https.onRequest(news);
+exports.categories = functions.https.onRequest(categories);
 exports.sideBlocks = functions.https.onRequest(sideBlocks);
 exports.siteInfo = functions.https.onRequest(siteInfo);
 
