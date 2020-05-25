@@ -74,3 +74,40 @@ exports.delCategory = async (id) => {
         }
     }
 };
+
+exports.updateCategory = async (id, { title, count }) => {
+    const value = await checkValue(id, 'categories');
+    if(!value) 
+        return {
+            success: false,
+            message: RESPONSE_MESSAGES.REJECT.NOT_FOUND
+        };
+        
+    const data = {};
+    if (!_.isEmpty(title) || !_.isEmpty(count)) {
+        if (!_.isEmpty(title))
+            data.title = title;
+
+        if (!_.isEmpty(count))
+            data.count = count;
+    } else {
+        return {
+            success: false,
+            title: RESPONSE_MESSAGES.REJECT.NOT_PROPERTY
+        }
+    }
+
+    try {
+        await admin.database().ref(`/categories/${id}`).update(data);
+        return {
+            success: true,
+            message: RESPONSE_MESSAGES.SUCCESS.UPDATE
+        }
+    } catch (err) {
+        return {
+            success: false,
+            message: RESPONSE_MESSAGES.REJECT.NOT_UPDATE
+        }
+    }
+
+};

@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const express = require('express');
 const categories = express();
-const { addCategory, getCategories, delCategory } = require("./functions");
+const { addCategory, getCategories, delCategory, updateCategory } = require("./functions");
 const { authenticate } = require('../authenticate');
 
 categories.get("/", async (req, res) => {
@@ -23,6 +23,14 @@ categories.post("/", async (req, res) => {
 categories.delete("/:id", async (req, res) => {
     const { id } = req.params;
     const result = await delCategory(id);
+    const status = result.success ? 200 : 400;
+    res.set('Access-Control-Allow-Origin', '*');
+    res.status(status).json(result);
+});
+
+categories.put("/:id", async (req, res) => {
+    const { id } = req.params;
+    const result = await updateCategory(id, req.body);
     const status = result.success ? 200 : 400;
     res.set('Access-Control-Allow-Origin', '*');
     res.status(status).json(result);
