@@ -7,9 +7,9 @@ const checkValue = async (key, ref) => {
     return snapshot.val();
 };
 
-exports.getCategories =  async () => {
+exports.getCategories =  async table => {
     try{
-        const query = await admin.database().ref("/categories").once("value");
+        const query = await admin.database().ref("/categories").child(table).once("value");
         const data = query.val();      
         const arr = [];
         _.forIn(data, (val, key) => {
@@ -27,7 +27,7 @@ exports.getCategories =  async () => {
     }
 };
 
-exports.addCategory = async (title) => {
+exports.addCategory = async (table, title) => {
     if (_.isEmpty(title))
         return {
             success: false,
@@ -35,7 +35,7 @@ exports.addCategory = async (title) => {
         }
 
     try {
-        const query = await admin.database().ref("/categories").push({ title, count: 0 });
+        const query = await admin.database().ref("categories").child(table).push({ title, count: 0 });
         if(query.key)
             return {
                 success: true,
@@ -53,8 +53,8 @@ exports.addCategory = async (title) => {
     }
 };
 
-exports.delCategory = async (id) => {
-    const value = await checkValue(id, 'categories');
+exports.delCategory = async (table, id) => {
+    const value = await checkValue(id, `categories/${table}`);
     if(!value) 
         return {
             success: false,
@@ -62,7 +62,7 @@ exports.delCategory = async (id) => {
         };
 
     try {
-        await admin.database().ref(`/categories/${id}`).remove();
+        await admin.database().ref(`/categories/${table}`).child(id).remove();
         return {
             success: true,
             message: RESPONSE_MESSAGES.SUCCESS.DELETE
@@ -75,8 +75,8 @@ exports.delCategory = async (id) => {
     }
 };
 
-exports.updateCategory = async (id, { title, count }) => {
-    const value = await checkValue(id, 'categories');
+exports.updateCategory = async ({ table, id }, { title, count }) => {
+    const value = await checkValue(id, `categories/${table}`);
     if(!value) 
         return {
             success: false,
@@ -98,7 +98,7 @@ exports.updateCategory = async (id, { title, count }) => {
     }
 
     try {
-        await admin.database().ref(`/categories/${id}`).update(data);
+        await admin.database().ref(`/categories/${table}`).child(id).update(data);
         return {
             success: true,
             message: RESPONSE_MESSAGES.SUCCESS.UPDATE

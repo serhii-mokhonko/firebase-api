@@ -5,6 +5,7 @@ exports.RESPONSE_MESSAGES = {
         UPDATE: "Successfully updated"
     },
     REJECT: {
+        NOT_TABLE: "Table name is reqired",
         NOT_ADD: "Could not add record",
         NOT_TITLE: "Title is reqired",
         NOT_PROPERTY: "Object should have 'title' or 'count' property",
