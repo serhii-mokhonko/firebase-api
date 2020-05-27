@@ -13,8 +13,8 @@ categories.get("/", async (req, res) => {
 
 categories.post("/", async (req, res) => {
     const { title } = req.body;
-    // const auth = authenticate(token);
-    const result = await addCategory(title);
+    const isLoggedIn = await authenticate(req);
+    const result = isLoggedIn.authenticated ? await addCategory(title) : isLoggedIn ;
     const status = result.success ? 200 : 400;
     res.set('Access-Control-Allow-Origin', '*');
     res.status(status).json(result);
@@ -22,7 +22,8 @@ categories.post("/", async (req, res) => {
 
 categories.delete("/:id", async (req, res) => {
     const { id } = req.params;
-    const result = await delCategory(id);
+    const isLoggedIn = await authenticate(req);
+    const result = isLoggedIn.authenticated ?  await delCategory(id) : isLoggedIn;
     const status = result.success ? 200 : 400;
     res.set('Access-Control-Allow-Origin', '*');
     res.status(status).json(result);
@@ -30,7 +31,8 @@ categories.delete("/:id", async (req, res) => {
 
 categories.put("/:id", async (req, res) => {
     const { id } = req.params;
-    const result = await updateCategory(id, req.body);
+    const isLoggedIn = await authenticate(req);
+    const result = isLoggedIn.authenticated ? await updateCategory(id, req.body) : isLoggedIn;
     const status = result.success ? 200 : 400;
     res.set('Access-Control-Allow-Origin', '*');
     res.status(status).json(result);
