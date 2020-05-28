@@ -4,8 +4,13 @@ const cyrillicToTranslit = require("cyrillic-to-translit-js");
 const { RESPONSE_MESSAGES } = require("./response-messages");
 
 const checkValue = async (key, ref) => {
-    const snapshot = await admin.database().ref(`/${ref}/${key}`).once('value');
+    const snapshot = await admin.database().ref(ref).child(key).once('value');
     return snapshot.val();
+};
+
+const setUrl = title => {
+    const url = cyrillicToTranslit().transform(title, "_").toLowerCase();
+    return url.replace(/[\s.,!"'`#$&^@;:?*)(|/+><`=%]/g, "");
 };
 
 exports.getCategories =  async table => {
@@ -29,18 +34,22 @@ exports.getCategories =  async table => {
 };
 
 exports.addCategory = async (table, title) => {
+    if (_.isEmpty(table))
+        return {
+            success: false,
+            message: RESPONSE_MESSAGES.REJECT.NOT_TABLE
+        }
+
     if (_.isEmpty(title))
         return {
             success: false,
             message: RESPONSE_MESSAGES.REJECT.NOT_TITLE
         }
 
-    let category_url = cyrillicToTranslit().transform(title, "_").toLowerCase();
-    category_url = category_url.replace(/[\s.,!"'`#$&^@;:?*)(|/+><`=%]/g, "");
-
+    const url = setUrl(title);
 
     try {
-        const query = await admin.database().ref("categories").child(table).push({ title, category_url, count: 0 });
+        const query = await admin.database().ref("categories").child(table).push({ title, url, count: 0 });
         if(query.key)
             return {
                 success: true,
@@ -67,7 +76,7 @@ exports.delCategory = async (table, id) => {
         };
 
     try {
-        await admin.database().ref(`/categories/${table}`).child(id).remove();
+        await admin.database().ref(`categories/${table}`).child(id).remove();
         return {
             success: true,
             message: RESPONSE_MESSAGES.SUCCESS.DELETE
@@ -90,15 +99,17 @@ exports.updateCategory = async ({ table, id }, { title, count }) => {
         
     const data = {};
     if (!_.isEmpty(title) || !_.isEmpty(count)) {
-        if (!_.isEmpty(title))
+        if (!_.isEmpty(title)) {
             data.title = title;
+            data.url = setUrl(title);
+        }
 
         if (!_.isEmpty(count))
             data.count = count;
     } else {
         return {
             success: false,
-            title: RESPONSE_MESSAGES.REJECT.NOT_PROPERTY
+            message: RESPONSE_MESSAGES.REJECT.NOT_PROPERTY
         }
     }
 
