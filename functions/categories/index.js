@@ -12,9 +12,8 @@ categories.get("/:table", async (req, res) => {
     res.status(status).json(result);
 });
 
-categories.post("/:table", async (req, res) => {
-    const { title } = req.body;
-    const { table } = req.params;
+categories.post("/", async (req, res) => {
+    const { title, table } = req.body;
     const isLoggedIn = await authenticate(req);
     const result = isLoggedIn.authenticated ? await addCategory(table, title) : isLoggedIn ;
     const status = result.success ? 200 : 400;

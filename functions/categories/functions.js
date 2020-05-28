@@ -1,5 +1,6 @@
 const admin = require('firebase-admin');
 const _ = require('lodash');
+const cyrillicToTranslit = require("cyrillic-to-translit-js");
 const { RESPONSE_MESSAGES } = require("./response-messages");
 
 const checkValue = async (key, ref) => {
@@ -34,8 +35,12 @@ exports.addCategory = async (table, title) => {
             message: RESPONSE_MESSAGES.REJECT.NOT_TITLE
         }
 
+    let category_url = cyrillicToTranslit().transform(title, "_").toLowerCase();
+    category_url = category_url.replace(/[\s.,!"'`#$&^@;:?*)(|/+><`=%]/g, "");
+
+
     try {
-        const query = await admin.database().ref("categories").child(table).push({ title, count: 0 });
+        const query = await admin.database().ref("categories").child(table).push({ title, category_url, count: 0 });
         if(query.key)
             return {
                 success: true,
