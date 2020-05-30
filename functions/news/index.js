@@ -29,9 +29,9 @@ news.get("/:key", async (req, res) => {
 
 news.post('/', async (req, res) => {
   const isLoggedIn = await authenticate(req);
-  const { title, description, content, visible } = req.body;
+  const { title, description, content, visible, category } = req.body;
   const result = isLoggedIn.authenticated 
-    ? await addNews({ title, content, authorId: isLoggedIn.userID, description, visible }) 
+    ? await addNews({ title, content, authorId: isLoggedIn.userID, description, visible, category }) 
     : isLoggedIn;
   res.set('Access-Control-Allow-Origin', '*');
   res.json(result);
