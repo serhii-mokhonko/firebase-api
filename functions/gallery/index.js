@@ -2,7 +2,7 @@ const express = require('express');
 const gallery = express();
 const cors = require('cors');
 gallery.use(cors());
-const { createRecord, writeToDb, uploadFile, deleteFile, getListsOfFiles, getImage } = require('./functions');
+const { createRecord, writeToDb, uploadFile, deleteFile, getListsOfFiles, getImage, updatePhotoUrl } = require('./functions');
 
 
 //Bucket config
@@ -91,39 +91,6 @@ gallery.post("/news/:id", async (req, res) => {
 
   const status = result.success ? 200 : 500;
   res.set('Access-Control-Allow-Origin', '*');
-  res.status(status).json(result);
-});
-
-gallery.post("/news/:id", async (req, res) => {
-  const { id } = req.params;
-
-  let result,  dbWriteDataResult;
-  const fileUploadResult = await uploadFile(req, bucket, id);
-  
-  if(fileUploadResult.success) {
-    const { filename, url } = fileUploadResult.result;
-    dbWriteDataResult = await updatePhotoUrl(id, { filename, url });
-  }
-
-  if(fileUploadResult.success && dbWriteDataResult.success) {
-    result = {
-      success: true,
-      messages: [
-        fileUploadResult.message,
-        dbWriteDataResult.message
-      ],
-    }
-  } else {
-    result = {
-      success: false,
-      messages: [
-        fileUploadResult.message,
-        dbWriteDataResult.message
-      ]
-    }
-  }
-
-  const status = result.success ? 200 : 500;
   res.status(status).json(result);
 });
 

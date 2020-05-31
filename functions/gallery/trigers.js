@@ -5,18 +5,9 @@ exports.deleteFromBucket = async (object) => {
     const id = filenameArr[0];
     const snapshot = await admin.database().ref(`/gallery/${id}`).once('value');
     if(snapshot.val()){
-        console.log("Gallery");
         admin.database().ref('/gallery').child(id).remove();
     } else {
-        console.log("NEWS");
         admin.database().ref('/news').child(id).update({ photo: null });
     }
-    return;
-};
-
-exports.deleteTitleImage = async (object) => {
-    const filenameArr = object.name.split('&');
-    const id = filenameArr[0];
-    await admin.database().ref('/news').child(id).update({ photo: null });
     return;
 };
