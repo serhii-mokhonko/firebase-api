@@ -6,6 +6,11 @@ const Busboy = require('busboy');
 const fs = require('fs');
 const { RESPONSE_MESSAGES } = require('../response-messages');
 
+const checkValue = async (key, ref) => {
+    const snapshot = await admin.database().ref(`/${ref}/${key}`).once('value');
+    return snapshot.val();
+}
+
 exports.createRecord = async () => {
     const snapshot = await admin.database().ref('/gallery').push();
     return {
@@ -29,6 +34,22 @@ exports.writeToDb = async (id, data, description='') => {
         }
     }
 };
+
+exports.getImage = async (key) => {
+    let value = await checkValue(key, 'gallery');
+    if(!value) 
+        return {
+            success: false,
+            message: RESPONSE_MESSAGES.REJECT.GALLERY.GET_DATA
+        }
+
+    const data = _.assign(value, {'id': key});
+
+    return {
+        success: true,
+        data
+    }
+}
 
 exports.uploadFile = (req, bucket, id) => {
     return new Promise((resolve) => {

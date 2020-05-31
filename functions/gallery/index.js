@@ -2,7 +2,7 @@ const express = require('express');
 const gallery = express();
 const cors = require('cors');
 gallery.use(cors());
-const { createRecord, writeToDb, uploadFile, deleteFile, getListsOfFiles } = require('./functions');
+const { createRecord, writeToDb, uploadFile, deleteFile, getListsOfFiles, getImage } = require('./functions');
 
 
 //Bucket config
@@ -13,6 +13,14 @@ const gcconfig = {
 const { Storage } = require('@google-cloud/storage');
 const gcs = new Storage(gcconfig);
 const bucket = gcs.bucket("nuft-kebop.appspot.com");
+
+gallery.get('/:key', async (req, res) => {
+  const imageKey = req.params.key;
+  let result = await getImage(imageKey);
+
+  const responseStatus = result.success ? 200 : 400;
+  res.status(responseStatus).json(result);
+})
 
 gallery.post('/', async (req, res) => {
   const { description } = req.query;
