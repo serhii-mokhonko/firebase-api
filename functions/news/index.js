@@ -6,12 +6,12 @@ const { getNews, getSingleRecord, addNews, editNews, deleteNews, searchNews } = 
 const { authenticate } = require('../authenticate');
 
 news.get('/', async (req, res) => {
-  let { startAt, itemsOnPage, q, table } = req.query;
+  let { startAt, itemsOnPage, q } = req.query;
   let result;
   if(!_.isEmpty(q)){
     result = await searchNews(q, startAt, itemsOnPage);
   } else {
-    result = await getNews(startAt, itemsOnPage, table);
+    result = await getNews(startAt, itemsOnPage);
   }
 
   const status = result.success ? 200 : 400;

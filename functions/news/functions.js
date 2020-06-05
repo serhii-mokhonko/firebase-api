@@ -7,16 +7,17 @@ const checkValue = async (key, ref) => {
     return snapshot.val();
 }
 
-const getCategories = async table => {
+// !!! get categories from news only !!! 
+const getCategories = async () => {
     try{
-        const query = await admin.database().ref(`/categories/${table}`).once("value");
+        const query = await admin.database().ref(`/categories/news`).once("value");
         return query.val();
     } catch (err) {
         return false;
     }
 };
 
-exports.getNews = async (startAt, count, table) => {
+exports.getNews = async (startAt, count) => {
     if(_.isEmpty(startAt) || _.isEmpty(count))
         return{
             success: false,
@@ -44,7 +45,7 @@ exports.getNews = async (startAt, count, table) => {
                 massege: RESPONSE_MESSAGES.REJECT.NEWS.NOT_FOUND
             };
 
-        const categories  = await getCategories(table);
+        const categories  = await getCategories();
 
         const transformedData = transformData(data);
         
