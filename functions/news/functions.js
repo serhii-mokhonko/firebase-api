@@ -123,9 +123,12 @@ exports.getSingleRecord = async (key) => {
             message: RESPONSE_MESSAGES.REJECT.NEWS.ITEM_NOT_FOUND
         };
 
+    const categories  = await getCategories();
+    const newsData = transformCategories([record.val()], categories);
+
     return {
         success: true,
-        data: record.val()
+        data: newsData[0]
     };
 }
 
