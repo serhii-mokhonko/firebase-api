@@ -7,7 +7,16 @@ const checkValue = async (key, ref) => {
     return snapshot.val();
 }
 
-exports.getNews = async (startAt, count) => {
+const getCategories = async table => {
+    try{
+        const query = await admin.database().ref(`/categories/${table}`).once("value");
+        return query.val();
+    } catch (err) {
+        return false;
+    }
+};
+
+exports.getNews = async (startAt, count, table) => {
     if(_.isEmpty(startAt) || _.isEmpty(count))
         return{
             success: false,
@@ -28,17 +37,27 @@ exports.getNews = async (startAt, count) => {
         const query = admin.database().ref('/news').orderByKey().limitToLast(parseInt(count)).endAt(key);
         const snapshot = await query.once('value');
         const data = snapshot.val();
+        
         if(!data)
             return {
                 success: false,
                 massege: RESPONSE_MESSAGES.REJECT.NEWS.NOT_FOUND
             };
 
+        const categories  = await getCategories(table);
+
         const transformedData = transformData(data);
+        
+        const newsData = transformedData.map(el => {
+            if (!el.hasOwnProperty("category")) return el;
+            const sourceCat = categories.hasOwnProperty(el.category) ? categories[el.category] : {};
+            const mergedObj = Object.assign(sourceCat, { id: el.category } );
+            return Object.assign(el, { category: mergedObj });  
+        })
 
         return {
             success: true,
-            data: transformedData.reverse(),
+            data: newsData.reverse(),
             newsCount: keys.length
         };
 
@@ -121,6 +140,7 @@ exports.addNews = async (data) => {
         };
     
     data.description = data.description || "";
+    data.category = data.category || {};
     data.visible = !_.isBoolean(data.visible) ? true : data.visible;
     data.created = Date.now();
 
@@ -148,6 +168,7 @@ exports.editNews = async (key, newData) => {
         };
 
     newData.description = newData.description || "";
+    newData.category = newData.category || {};
     newData.visible = !_.isBoolean(newData.visible) ? true : newData.visible;
     newData.updated = Date.now();
 
