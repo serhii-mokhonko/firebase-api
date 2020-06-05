@@ -48,14 +48,8 @@ exports.getNews = async (startAt, count) => {
         const categories  = await getCategories();
 
         const transformedData = transformData(data);
+        const newsData = transformCategories(transformedData, categories);
         
-        const newsData = transformedData.map(el => {
-            if (!el.hasOwnProperty("category")) return el;
-            const sourceCat = categories.hasOwnProperty(el.category) ? categories[el.category] : {};
-            const mergedObj = Object.assign(sourceCat, { id: el.category } );
-            return Object.assign(el, { category: mergedObj });  
-        })
-
         return {
             success: true,
             data: newsData.reverse(),
@@ -77,9 +71,11 @@ exports.searchNews = async (str, startAt, itemsOnPage) => {
     try{
         const query = await admin.database().ref('news').once('value');
         const data = query.val();
+        const categories  = await getCategories();
         const transformedData = transformData(data);
+        const newsData = transformCategories(transformedData, categories);
 
-        result = transformedData.reverse().filter(el => {
+        result = newsData.reverse().filter(el => {
             const title =  _.toLower(el.title);
             const content = _.toLower(el.content);
 
@@ -202,3 +198,13 @@ const transformData = (obj) => {
     })
     return arr;
 };
+
+
+const transformCategories = (data, categories) => {
+    return data.map(el => {
+        if (!el.hasOwnProperty("category")) return el;
+        const sourceCat = categories.hasOwnProperty(el.category) ? categories[el.category] : {};
+        const mergedObj = Object.assign(sourceCat, { id: el.category } );
+        return Object.assign(el, { category: mergedObj });  
+    });
+}
