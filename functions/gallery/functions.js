@@ -18,8 +18,8 @@ exports.createRecord = async () => {
     };
 }
 
-exports.writeToDb = async (id, data, description='') => {
-    const dbRecord = _.assign(data, { description });
+exports.writeToDb = async ({ id, data, category = "", description='' }) => {
+    const dbRecord = _.assign(data, { description, category });
     try{
         await admin.database().ref(`/gallery/${id}`).set(dbRecord);
         return {
