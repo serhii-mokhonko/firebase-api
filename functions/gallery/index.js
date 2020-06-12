@@ -1,8 +1,18 @@
 const express = require('express');
 const gallery = express();
 const cors = require('cors');
+const _ = require("lodash");
 gallery.use(cors());
-const { createRecord, writeToDb, uploadFile, deleteFile, getListsOfFiles, getImage, updatePhotoUrl } = require('./functions');
+const {
+  createRecord, 
+  writeToDb,
+  uploadFile,
+  deleteFile,
+  getListsOfFiles,
+  getImage,
+  updatePhotoUrl,
+  searchInBucket
+} = require('./functions');
 
 
 //Bucket config
@@ -118,8 +128,13 @@ gallery.delete("/news/:fileName", async (req, res) => {
 });
 
 gallery.get('/', async (req, res) => {
-  const { start, itemOnPage } = req.query;  
-  const result = await getListsOfFiles(parseInt(itemOnPage), parseInt(start));
+  const { start, items, q, c, timestart, timeend } = req.query;
+  let result;
+  if(!_.isEmpty(q) || !_.isEmpty(c) || !_.isEmpty(timestart) || !_.isEmpty(timeend)){
+    result = await searchInBucket({ q, c, timestart, timeend, start, items })
+  } else {
+    result = await getListsOfFiles(parseInt(items), parseInt(start));
+  }
 
   const status = result.success ? 200 : 400;
   res.set('Access-Control-Allow-Origin', '*');

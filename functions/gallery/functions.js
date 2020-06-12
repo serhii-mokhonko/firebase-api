@@ -5,6 +5,7 @@ const path = require('path');
 const Busboy = require('busboy');
 const fs = require('fs');
 const { RESPONSE_MESSAGES } = require('../response-messages');
+const { result } = require('lodash');
 
 const checkValue = async (key, ref) => {
     const snapshot = await admin.database().ref(`/${ref}/${key}`).once('value');
@@ -145,14 +146,14 @@ exports.deleteFile = async (fileName, bucket) => {
     }
 };
 
-exports.getListsOfFiles = async (itemOnPage, start) => {
-    itemOnPage = itemOnPage || 25;
+exports.getListsOfFiles = async (items, start) => {
+    items = items || 25;
     start = start || 0;
     try{
         const dbRecords =  await admin.database().ref('/gallery').once('value');
         const keys = Object.keys(dbRecords.val()).reverse();
         const key = keys[start]
-        const query = admin.database().ref('/gallery').orderByKey().limitToLast(itemOnPage).endAt(key);
+        const query = admin.database().ref('/gallery').orderByKey().limitToLast(items).endAt(key);
         const result = await query.once('value');
         const data = transformData(result.val()).reverse();
         return{
@@ -168,6 +169,51 @@ exports.getListsOfFiles = async (itemOnPage, start) => {
     }
     
 }
+
+exports.searchInBucket = async (params) => {
+    let { items = 25, start = 0 } = params;
+    let data;
+
+    const query = await admin.database().ref('/gallery').once('value');
+    data = transformData(query.val());
+
+    const filters = {
+        q: el => el.hasOwnProperty("description") && _.toLower(el.description).includes(_.toLower(params.q)),
+        c: el => el.hasOwnProperty("category") && el.category === params.c,
+        // timestart: () =>{},
+        // timeend: () =>{}
+    }
+
+    data = data.filter(item => {
+        const results = [];
+        for (let key in filters) {
+            if(!_.isEmpty(params[key])){
+                const fun = filters[key];
+                results.push(fun(item));
+            }
+        }
+        return results.every(el => el === true);
+    });
+
+    if (data.length > 0) {
+        if(!_.isEmpty(start) || !_.isEmpty(items)) {
+            start = parseInt(start);
+            end = start + parseInt(items);
+           
+            return {
+                success: true,
+                data:  data.slice(start, end),
+                count: data.length
+            };
+        }
+
+    }
+
+    return {
+        success: false,
+        message: RESPONSE_MESSAGES.REJECT.SEARCH.NOT_FOUND
+    };
+};
 
 const transformData = (obj) => {
     const arr = [];
