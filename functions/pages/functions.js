@@ -7,6 +7,15 @@ const checkValue = async (key, ref) => {
     return snapshot.val();
 }
 
+const getCategories = async () => {
+    try{
+        const query = await admin.database().ref(`/categories/pages`).once("value");
+        return query.val();
+    } catch (err) {
+        return false;
+    }
+};
+
 exports.getPages = async (startAt, count) => {
     if(_.isEmpty(startAt) || _.isEmpty(count))
         return{
@@ -16,7 +25,7 @@ exports.getPages = async (startAt, count) => {
 
     try {
         const dbRecords =  await admin.database().ref('/pages').once('value');
-        const keys = Object.keys(dbRecords.val()).reverse();
+        const keys = Object.keys(dbRecords.val() || {}).reverse();
         const key = keys[parseInt(startAt)]
 
         if(parseInt(startAt) >= keys.length)
@@ -34,19 +43,21 @@ exports.getPages = async (startAt, count) => {
                 massege: RESPONSE_MESSAGES.REJECT.NEWS.NOT_FOUND
             };
 
+        const categories  = await getCategories();
+
         const transformedData = transformData(data);
+        const newsData = transformCategories(transformedData, categories);
 
         return {
             success: true,
-            data: transformedData.reverse(),
+            data: newsData.reverse(),
             newsCount: keys.length
         };
 
     } catch (err) {
         return {
             success: false,
-            error: err.message,
-            message: RESPONSE_MESSAGES.REJECT.NEWS.GET_DATA
+            error: err.message
         }
     }
 };
@@ -57,9 +68,11 @@ exports.searchPages = async (str, startAt, itemsOnPage) => {
     try{
         const query = await admin.database().ref('pages').once('value');
         const data = query.val();
+        const categories  = await getCategories();
         const transformedData = transformData(data);
+        const newsData = transformCategories(transformedData, categories);
 
-        result = transformedData.reverse().filter(el => {
+        result = newsData.reverse().filter(el => {
             const title =  _.toLower(el.title);
             const content = _.toLower(el.content);
 
@@ -107,9 +120,12 @@ exports.getSingleRecord = async (key) => {
             message: RESPONSE_MESSAGES.REJECT.NEWS.ITEM_NOT_FOUND
         };
 
+        const categories  = await getCategories();
+        const newsData = transformCategories([record.val()], categories);
+
     return {
         success: true,
-        data: record.val()
+        data: newsData[0]
     };
 }
 
@@ -120,7 +136,6 @@ exports.addPage = async (data) => {
             message: RESPONSE_MESSAGES.REJECT.NEWS.FIELDS_EMPTY
         };
     
-    data.description = data.description || "";
     data.visible = !_.isBoolean(data.visible) ? true : data.visible;
     data.created = Date.now();
 
@@ -147,7 +162,6 @@ exports.editPage = async (key, newData) => {
             message: RESPONSE_MESSAGES.REJECT.NEWS.FIELDS_EMPTY
         };
 
-    newData.description = newData.description || "";
     newData.visible = !_.isBoolean(newData.visible) ? true : newData.visible;
     newData.updated = Date.now();
 
@@ -180,3 +194,12 @@ const transformData = (obj) => {
     })
     return arr;
 };
+
+const transformCategories = (data, categories) => {
+    return data.map(el => {
+        if (!el.hasOwnProperty("category")) return el;
+        const sourceCat = categories.hasOwnProperty(el.category) ? categories[el.category] : {};
+        const mergedObj = Object.assign(sourceCat, { id: el.category } );
+        return Object.assign(el, { category: mergedObj });  
+    });
+}

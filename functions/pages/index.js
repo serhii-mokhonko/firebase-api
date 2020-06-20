@@ -3,7 +3,7 @@ const express = require('express');
 const pages = express();
 const { getPages, getSingleRecord, addPage, editPage, deletePage, searchPages } = require('./functions');
 
-const { authenticate } = require('../authenticate');
+const { authenticate } = require('./authenticate');
 
 pages.get('/', async (req, res) => {
   let { startAt, itemsOnPage, q } = req.query;
@@ -29,9 +29,9 @@ pages.get("/:key", async (req, res) => {
 
 pages.post('/', async (req, res) => {
   const isLoggedIn = await authenticate(req);
-  const { title, description, content, visible } = req.body;
+  const { title, description, content, visible, category } = req.body;
   const result = isLoggedIn.authenticated 
-    ? await addPage({ title, content, authorId: isLoggedIn.userID, description, visible }) 
+    ? await addPage({ title, content, authorId: isLoggedIn.userID, category, visible }) 
     : isLoggedIn;
   res.set('Access-Control-Allow-Origin', '*');
   res.json(result);
@@ -39,10 +39,10 @@ pages.post('/', async (req, res) => {
 
 pages.put('/:key', async (req, res) => {
   const key = req.params.key;
-  const { title, description, content, visible } = req.body;
+  const { title, category, content, visible } = req.body;
   const isLoggedIn = await authenticate(req);
   const result = isLoggedIn.authenticated 
-    ? await editPage(key, { title, description, content, userIdUpdate: isLoggedIn.userID, visible }) 
+    ? await editPage(key, { title, category, content, userIdUpdate: isLoggedIn.userID, visible }) 
     : isLoggedIn;
   res.set('Access-Control-Allow-Origin', '*');
   res.json(result);
