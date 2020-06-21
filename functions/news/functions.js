@@ -1,6 +1,7 @@
 const admin = require('firebase-admin');
 const _ = require('lodash');
 const { RESPONSE_MESSAGES } = require('../response-messages');
+const { response } = require('express');
 
 const checkValue = async (key, ref) => {
     const snapshot = await admin.database().ref(`/${ref}/${key}`).once('value');
@@ -17,25 +18,43 @@ const getCategories = async () => {
     }
 };
 
-exports.getNews = async (startAt, count) => {
-    if(_.isEmpty(startAt) || _.isEmpty(count))
-        return{
-            success: false,
-            message: RESPONSE_MESSAGES.REJECT.NEWS.PARAMS_NOT_SET
-        };
+const filterNewsBySearchQuery = (news, q) => {
+    return news.filter(el => {
+        const title =  _.toLower(el.title || "");
+        const content = _.toLower(el.content || "");
+        const description = _.toLower(el.description || "");
+
+        return ( title.includes(q) || content.includes(q) || description.includes(q) );
+    });
+}
+
+const filterNewsByCategory = (news, category) => {
+    const filters = {
+        c: el => el.hasOwnProperty("category") && el.category.url === category,
+    }
+
+    return news.filter(item => {
+        const results = [];
+        for (let key in filters) {
+            const fun = filters[key];
+            results.push(fun(item));
+        }
+        return results.every(el => el === true);
+    });
+}
+
+exports.getNews = async ({startAt, count, category, q}) => {
+    startAt = startAt || 0;
+    count = count || 1;
+    category = category || "";
+    q = q || "";
 
     try {
         const dbRecords =  await admin.database().ref('/news').once('value');
         const keys = Object.keys(dbRecords.val()).reverse();
         const key = keys[parseInt(startAt)]
 
-        if(parseInt(startAt) >= keys.length)
-            return {
-                success: false,
-                message: RESPONSE_MESSAGES.REJECT.NEWS.OUT_OF_RANGE
-            };
-    
-        const query = admin.database().ref('/news').orderByKey().limitToLast(parseInt(count)).endAt(key);
+        const query = admin.database().ref('/news');
         const snapshot = await query.once('value');
         const data = snapshot.val();
         
@@ -46,15 +65,32 @@ exports.getNews = async (startAt, count) => {
             };
 
         const categories  = await getCategories();
-
         const transformedData = transformData(data);
-        const newsData = transformCategories(transformedData, categories);
-        
-        return {
+        let newsData = transformCategories(transformedData, categories);
+
+        if(!_.isEmpty(category)) {
+            newsData = filterNewsByCategory(newsData, category)
+        }
+
+        if(!_.isEmpty(q)) {
+            newsData = filterNewsBySearchQuery(newsData, q);
+        }
+
+        const news = newsData.reverse().splice(startAt, count)
+
+        let response = {
             success: true,
-            data: newsData.reverse(),
-            newsCount: keys.length
+            newsCount: news.length,
+            data: news
         };
+
+        if(!_.isEmpty(category)) {
+            const categoryObject = _.find(categories, cat => cat.hasOwnProperty("url") && cat.url === category);
+            const categoryName = !_.isNil(categoryObject) ? categoryObject.title : `Такої категорії не існує`;
+            response = _.merge(response, { categoryName })
+        }
+
+        return response;
 
     } catch (err) {
         return {
@@ -63,56 +99,6 @@ exports.getNews = async (startAt, count) => {
             message: RESPONSE_MESSAGES.REJECT.NEWS.GET_DATA
         }
     }
-};
-
-exports.searchNews = async (str, startAt, itemsOnPage) => {
-    const searchStr =  _.toLower(str);
-    let result;
-    try{
-        const query = await admin.database().ref('news').once('value');
-        const data = query.val();
-        const categories  = await getCategories();
-        const transformedData = transformData(data);
-        const newsData = transformCategories(transformedData, categories);
-
-        result = newsData.reverse().filter(el => {
-            const title =  _.toLower(el.title);
-            const content = _.toLower(el.content);
-
-            return ( title.includes(searchStr) || content.includes(searchStr) );
-        });
-
-    }catch(err) {
-        return {
-            success: false,
-            message: RESPONSE_MESSAGES.REJECT.SEARCH.ERROR,
-            error: err.message
-        };
-    }
-
-    if(result.length > 0) {
-        if(!_.isEmpty(startAt) || !_.isEmpty(itemsOnPage)) {
-            const start = parseInt(startAt);
-            const end = start + parseInt(itemsOnPage);
-            const cuttedOutResult = result.slice(start, end);
-            return {
-                success: true,
-                data: cuttedOutResult,
-                newsCount: result.length
-            };
-        }
-
-        return {
-            success: true,
-            data: result,
-            count: result.length
-        };
-    }
-
-    return {
-        success: false,
-        message: RESPONSE_MESSAGES.REJECT.SEARCH.NOT_FOUND
-    };
 };
 
 exports.getSingleRecord = async (key) => {
