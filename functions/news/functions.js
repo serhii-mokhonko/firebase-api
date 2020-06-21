@@ -43,7 +43,11 @@ const filterNewsByCategory = (news, category) => {
     });
 }
 
-exports.getNews = async ({startAt, count, category, q}) => {
+const filterNewsByVisibility = (news) => {
+    return news.filter(el => el.visible);
+}
+
+exports.getNews = async ({startAt, count, category, q, hideNotVisibile}) => {
     startAt = startAt || 0;
     count = count || 1;
     category = category || "";
@@ -74,6 +78,10 @@ exports.getNews = async ({startAt, count, category, q}) => {
 
         if(!_.isEmpty(q)) {
             newsData = filterNewsBySearchQuery(newsData, q);
+        }
+
+        if(hideNotVisibile) {
+            newsData = filterNewsByVisibility(newsData)
         }
 
         const news = newsData.reverse().splice(startAt, count)

@@ -6,8 +6,8 @@ const { getNews, getSingleRecord, addNews, editNews, deleteNews } = require('./f
 const { authenticate } = require('../authenticate');
 
 news.get('/', async (req, res) => {
-  let { startAt, itemsOnPage, q } = req.query;
-  let result = await getNews({q, startAt, count: itemsOnPage});
+  let { startAt, itemsOnPage, q, hideNotVisible = true } = req.query;
+  let result = await getNews({q, startAt, count: itemsOnPage, hideNotVisibile: hideNotVisible === 'false' ? false : hideNotVisible});
 
   const status = result.success ? 200 : 400;
   res.set('Access-Control-Allow-Origin', '*');
@@ -25,8 +25,8 @@ news.get("/:key", async (req, res) => {
 news.get('/category/:categoryId', async (req, res) => {
   const categoryId = req.params.categoryId;
 
-  let { startAt, itemsOnPage, q } = req.query;
-  let result = await getNews({q, startAt, count: itemsOnPage, category: categoryId});
+  let { startAt, itemsOnPage, q, hideNotVisible = true } = req.query;
+  let result = await getNews({q, startAt, count: itemsOnPage, category: categoryId, hideNotVisibile: hideNotVisible === 'false' ? false : hideNotVisible});
 
   const status = result.success ? 200 : 400;
   res.set('Access-Control-Allow-Origin', '*');
