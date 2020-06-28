@@ -180,11 +180,11 @@ exports.searchInBucket = async (params) => {
     const filters = {
         q: el => el.hasOwnProperty("description") && _.toLower(el.description).includes(_.toLower(params.q)),
         c: el => el.hasOwnProperty("category") && el.category === params.c,
-        // timestart: () =>{},
-        // timeend: () =>{}
+        timestart: el => el.hasOwnProperty("uploadedTime") && el.uploadedTime >= params.timestart,
+        timeend: el => el.hasOwnProperty("uploadedTime") && el.uploadedTime <= params.timeend
     }
 
-    data = data.filter(item => {
+    data = data.reverse().filter(item => {
         const results = [];
         for (let key in filters) {
             if(!_.isEmpty(params[key])){
